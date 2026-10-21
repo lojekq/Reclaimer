@@ -58,16 +58,18 @@ The space comes back when the quarantine is cleaned: by itself after 7 days (1�
 
 ## Download
 
-1. Get **`Reclaimer-x.y.z-win-x64.exe`** from [Releases](https://github.com/lojekq/Reclaimer/releases/latest). Single file, no install, no admin.
-2. Smaller build: `Reclaimer-x.y.z-win-x64-fd.zip` (needs [.NET Desktop Runtime 10](https://dotnet.microsoft.com/download/dotnet/10.0)).
+1. **[Download Reclaimer.exe](https://github.com/lojekq/Reclaimer/releases/latest/download/Reclaimer.exe)** (latest release). One file, no admin rights.
+2. Smaller build: [`Reclaimer-fd.zip`](https://github.com/lojekq/Reclaimer/releases/latest/download/Reclaimer-fd.zip) (needs [.NET Desktop Runtime 10](https://dotnet.microsoft.com/download/dotnet/10.0)).
 3. Optional check: `gh attestation verify <file> -R lojekq/Reclaimer` or compare with `SHA256SUMS.txt`.
 
 Requirements: Windows 11 x64. Windows 10 22H2 should work but is not tested.
 
 ## First run
 
-Put the exe into `%LOCALAPPDATA%\Programs\Reclaimer\` first. From there it starts with Windows by default, because the quarantine is cleaned by the running app; from any other folder autostart stays off until you turn it on.
-On the first start Windows may show a SmartScreen warning (see FAQ). Add your project folders on the Overview page, press **Scan**, tick what you don't need and press **Move to quarantine**. Models are never ticked for you.
+Run the downloaded exe from anywhere. Windows may show a SmartScreen warning first (see FAQ).
+Reclaimer offers to install itself: **Install** copies it to `%LOCALAPPDATA%\Programs\Reclaimer\`, adds a Start menu shortcut, an entry in Settings → Apps and autostart (the quarantine is cleaned by the running app); no admin rights.
+**Run without installing** keeps it portable, without autostart. To update, run a newer exe the same way: it replaces the installed one and restarts it.
+Then add your project folders on the Overview page, press **Scan**, tick what you don't need and press **Move to quarantine**. Models are never ticked for you.
 
 ## Settings
 
@@ -80,7 +82,9 @@ On the first start Windows may show a SmartScreen warning (see FAQ). Add your pr
 | Model folders | none | ComfyUI `models`, GGUF folders: files of 100 MB and more |
 | Own cache folders | none | Moved as a whole: only folders a tool refills by itself |
 | Excluded folders | none | Never scanned or moved |
-| Language, theme, Start with Windows, Start menu shortcut, check for updates | | As in every app of the set |
+| Start with Windows | on after install | Needed for the automatic cleanup of the quarantine |
+| Installation | — | Install, or Uninstall when installed |
+| Language, theme, Start menu shortcut, check for updates | | As in every app of the set |
 
 Settings, the action history (`history.jsonl`) and logs live in `%APPDATA%\Reclaimer`. The quarantine is `%LOCALAPPDATA%\Reclaimer\Quarantine` on the system disk and a hidden `.reclaimer-quarantine` folder on other disks.
 
@@ -95,7 +99,7 @@ Smart App Control, if it is on, blocks unsigned files with no way to allow one; 
 
 <details><summary>My antivirus flags it</summary>
 
-Reclaimer renames and deletes folders, which heuristics watch for. It never deletes outside its quarantine, has no packer and no obfuscation; the code is all here.
+Reclaimer renames and deletes folders, which heuristics watch for. It never deletes outside its quarantine, has no packer and no obfuscation, and it installs only into your user folder; the code is all here.
 Please report the false positive to your antivirus vendor and open an issue with the detection name and the SHA256 of the file.
 </details>
 
@@ -117,7 +121,9 @@ Windows Security protects Documents, Desktop and other folders from programs it 
 
 <details><summary>How do I uninstall?</summary>
 
-First restore or clean the quarantine: **Remove data and autostart** refuses while it holds anything, since the journal would go with the data. Then About → **Remove data and autostart**, and delete the exe.
+First restore or clean the quarantine: uninstalling refuses while it holds anything, since the moved data and its journal would be left behind or lost.
+Then Settings → **Uninstall**, or Windows Settings → Apps → Reclaimer → Uninstall. You choose whether settings, history and logs go too.
+Without installing: About → **Remove data and autostart**, then delete the exe.
 </details>
 
 ## Privacy
