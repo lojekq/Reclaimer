@@ -45,3 +45,4 @@ UNICODE_STRING
 // Reclaimer: Native.cs
 MoveFileEx
 GetVolumePathName
+GetFileInformationByHandle

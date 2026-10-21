@@ -45,6 +45,7 @@ public sealed class Entry
     public DateTime? LastUsed { get; set; }
     public long TotalBytes { get; set; }
     public List<EntryPart> Parts { get; set; } = [];
+    public string? LinkedTo { get; set; }      // v1.0 duplicate: the original path is now a hardlink to this file
 
     [JsonIgnore] public string Dir { get; set; } = "";
     [JsonIgnore] public string Root => Path.GetDirectoryName(Dir)!;
@@ -153,10 +154,14 @@ public static class Quarantine
         }
         var now = u.Parts.Sum(p => Fs.Size(p.Path));
         if (Math.Abs(now - u.Bytes) > u.Bytes / 10) return "Move.SizeChanged";
+        if (u.DedupeOf is { } keep && (u.Parts.Count != 1 || !File.Exists(keep) || new FileInfo(keep).Length != now
+                                       || File.GetLastWriteTimeUtc(keep) > u.KeepMtimeUtc.AddSeconds(2) || !SameVolume(keep, u.Parts[0].Path)))
+            return "Move.Changed"; // the kept copy changed or moved since the hash: no hardlink to a different file
 
         var reals = u.Parts.Select(p => PathGuard.Real(p.Path)).ToList();
         var root = RootFor(reals[0]);
-        if (!reals.All(InSandbox) || !InSandbox(root)) return "Move.OutsideSandbox";
+        if (!reals.All(InSandbox) || !InSandbox(root) || u.DedupeOf is { } k && !InSandbox(k)) return "Move.OutsideSandbox";
+        if (u.DedupeOf is { } kf && !AllowedRoots().Any(r => PathGuard.Check(kf, r) is null)) return "Guard.OutsideRoot";
         if (EnsureRoot(root) is { } noRoot) { u.Status = UnitStatus.NoQuarantine; return noRoot; }
         if (reals.Any(r => !SameVolume(r, root))) { u.Status = UnitStatus.NoQuarantine; return "Status.NoQuarantine"; }
 
@@ -166,6 +171,7 @@ public static class Quarantine
             Id = $"{created:yyyyMMdd-HHmmss}-{Guid.NewGuid():N}"[..22], CreatedUtc = created, ExpiresUtc = created.AddDays(days),
             State = EntryState.Moving, Category = u.Category, Title = u.Title, LastUsed = u.LastUsed, TotalBytes = u.Bytes,
             Parts = reals.Select((r, i) => new EntryPart { Original = r, Stored = $"{i}-{Path.GetFileName(r)}", IsDir = u.Parts[i].IsDir, Bytes = u.Parts[i].Bytes }).ToList(),
+            LinkedTo = u.DedupeOf,
         };
         e.Dir = Path.Combine(root, e.Id);
         try
@@ -189,6 +195,19 @@ public static class Quarantine
             else { e.State = EntryState.Broken; TryWrite(e); }
             History("move", e, $"error {err}");
             return MoveError(u, err, e.Parts[i].Original);
+        }
+        if (e.LinkedTo is { } kept)
+        {
+            var original = e.Parts[0].Original;
+            var err = Native.HardLink(original, kept);
+            if (err != 0 || !Native.SameFile(original, kept))
+            {
+                if (err == 0) File.Delete(original); // a link that isn't to the kept file: remove it before the copy goes back
+                if (RollBack(e, e.Parts.Count)) TryDeleteTree(e.Dir, root);
+                else { e.State = EntryState.Broken; TryWrite(e); }
+                History("dedupe", e, $"error {err}");
+                return "Move.LinkFailed";
+            }
         }
         e.State = EntryState.Done;
         TryWrite(e); // if this write is lost, Reconcile sees Moving with every part moved and puts them back: no data lost
@@ -249,6 +268,7 @@ public static class Quarantine
         if (e.State is EntryState.Broken or EntryState.Purging) return "Quarantine.Broken";
 
         var targets = new string?[e.Parts.Count]; // null = this part is already back (a restore that crashed half-way)
+        var unlink = new bool[e.Parts.Count];      // a duplicate: the original path holds a hardlink to the kept file, removed first
         var allowed = AllowedRoots().ToList();
         for (var i = 0; i < e.Parts.Count; i++)
         {
@@ -263,7 +283,8 @@ public static class Quarantine
             if (!allowed.Any(r => PathGuard.Check(p.Original, r, mustExist: false) is null)) return "Guard.OutsideRoot";
             if (!InSandbox(p.Original)) return "Move.OutsideSandbox";
             var target = p.Original;
-            if (Path.Exists(target))
+            if (e.LinkedTo is { } kept && File.Exists(target) && Native.SameFile(target, kept)) unlink[i] = true;
+            else if (Path.Exists(target))
             {
                 if (!beside) return "Restore.Conflict";
                 target += ".restored";
@@ -279,8 +300,10 @@ public static class Quarantine
         {
             if (targets[i] is not { } t) continue;
             Directory.CreateDirectory(Path.GetDirectoryName(t)!);
+            if (unlink[i]) File.Delete(t); // only a second name of the kept file: its data stays
             var err = MoveRetry(StoredPath(e, e.Parts[i]), t);
             if (err == 0) { done.Add(i); continue; }
+            if (unlink[i]) Native.HardLink(t, e.LinkedTo!); // the program keeps a working file
             foreach (var j in done) Native.Move(targets[j]!, StoredPath(e, e.Parts[j]));
             e.State = EntryState.Done;
             TryWrite(e);
@@ -368,6 +391,12 @@ public static class Quarantine
                 {
                     case EntryState.Moving:
                         if (FoldersBroken(e) || e.Parts.Any(p => !SafeName(p.Stored))) { MarkBroken(e); break; }
+                        if (e.LinkedTo is { } kept && e.Parts.Count == 1 && Path.Exists(StoredPath(e, e.Parts[0])) && Native.SameFile(e.Parts[0].Original, kept))
+                        {
+                            e.State = EntryState.Done; // the duplicate moved and its hardlink exists: only the last journal write was lost
+                            TryWrite(e);
+                            break;
+                        }
                         var lost = e.Parts.Any(p => !Path.Exists(StoredPath(e, p)) && !Path.Exists(p.Original));
                         if (!lost && RollBack(e, e.Parts.Count)) { TryDeleteTree(e.Dir, e.Root); History("reconcile", e, "rolled back"); }
                         else MarkBroken(e);

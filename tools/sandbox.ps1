@@ -72,6 +72,11 @@ Big 'models\checkpoints\demo-sd15.safetensors' 160 | Out-Null
 Big 'models\loras\tiny.safetensors' 12 | Out-Null   # under 100 MB: not a unit
 Old (Join-Path $S 'models') 150
 
+# v1.0 duplicates: the same 1 GB of weights as an Ollama blob (named by its sha256) and in the model folder
+$dup = Big 'models\checkpoints\same-weights.safetensors' 1024
+$h = (Get-FileHash $dup -Algorithm SHA256).Hash.ToLower()
+Copy-Item $dup (Join-Path $S "ollama\models\blobs\sha256-$h")
+
 # Projects in git (dates of the past via GIT_*_DATE)
 function Repo($name, [int]$days, [string]$ignore) {
   $d = Folder "projects\$name"

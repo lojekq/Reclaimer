@@ -351,6 +351,50 @@ public class SafetyTests
     }
 
     [TestMethod]
+    public void DuplicateBecomesAHardlinkAndComesBack()
+    {
+        var src = Mk("src");
+        var bytes = Enumerable.Range(0, 4096).Select(i => (byte)(i * 7)).ToArray();
+        var sha = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(bytes));
+        var blob = Path.Combine(Mk(@"src\ollama\blobs"), "sha256-" + sha);
+        File.WriteAllBytes(blob, bytes);
+        var gguf = Path.Combine(Mk(@"src\lmstudio\pub\repo"), "model.gguf");
+        File.WriteAllBytes(gguf, bytes);
+        var other = Path.Combine(Mk(@"src\lmstudio\pub\other"), "other.gguf");
+        File.WriteAllBytes(other, bytes.Reverse().ToArray());                  // same size, different content: not a duplicate
+
+        Dupes.MinBytes = 1024;
+        try
+        {
+            var found = Dupes.Find(
+            [
+                new("Ollama", blob, bytes.Length, sha, Path.Combine(src, "ollama"), []),
+                new("LM Studio", gguf, bytes.Length, null, Path.Combine(src, "lmstudio"), []),
+                new("LM Studio", other, bytes.Length, null, Path.Combine(src, "lmstudio"), []),
+            ], default);
+            var dupe = found.Single();
+            Assert.AreEqual(gguf, dupe.Path);
+            Assert.AreEqual(blob, dupe.DedupeOf);                                   // the content-addressed copy is kept
+
+            Assert.IsNull(Quarantine.Move(dupe, 7));
+            Assert.IsTrue(Native.SameFile(gguf, blob));                             // LM Studio still finds its file
+            CollectionAssert.AreEqual(bytes, File.ReadAllBytes(gguf));
+            Assert.IsEmpty(Dupes.Find([new("Ollama", blob, bytes.Length, sha, src, []), new("LM Studio", gguf, bytes.Length, null, src, [])], default));
+
+            Assert.IsNull(Quarantine.Restore(Quarantine.List().Single()));          // the link goes, the copy comes back
+            Assert.IsFalse(Native.SameFile(gguf, blob));
+            CollectionAssert.AreEqual(bytes, File.ReadAllBytes(gguf));
+            Assert.IsTrue(File.Exists(blob));
+
+            Assert.IsNull(Quarantine.Move(Dupes.Find([new("Ollama", blob, bytes.Length, sha, src, []), new("LM Studio", gguf, bytes.Length, null, Path.Combine(src, "lmstudio"), [])], default).Single(), 7));
+            Assert.IsNull(Quarantine.Purge(Quarantine.List().Single()).Error);      // the copy is deleted, both names still read the data
+            CollectionAssert.AreEqual(bytes, File.ReadAllBytes(gguf));
+            CollectionAssert.AreEqual(bytes, File.ReadAllBytes(blob));
+        }
+        finally { Dupes.MinBytes = 1L << 30; }
+    }
+
+    [TestMethod]
     public void DebugSandboxRefusesOutside()
     {
         var src = Mk("src");

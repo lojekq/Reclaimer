@@ -31,6 +31,8 @@ public sealed class Unit : INotifyPropertyChanged
     public UsedSource Source { get; init; }
     public string[] Owners { get; init; } = [];          // process name prefixes that block the move
     public string? Rebuild { get; init; }               // Loc key: how it comes back
+    public string? DedupeOf { get; init; }              // v1.0 duplicate: after the move a hardlink to this kept file takes the part's place
+    public DateTime KeepMtimeUtc { get; init; }         // the kept file must not change between the scan and the move
     public string? Marker { get; init; }                // project marker found, e.g. package.json
     public List<string> Notes { get; init; } = [];      // already localized lines for the details panel
     public bool Approximate { get; init; }              // hardlinks, block cloning: freed space may be smaller

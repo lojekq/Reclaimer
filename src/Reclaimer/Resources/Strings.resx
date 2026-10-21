@@ -270,4 +270,10 @@ Open the folder?</value></data>
   <data name="Compact.Refused" xml:space="preserve"><value>This file is not a WSL or Docker disk Reclaimer knows.</value></data>
   <data name="Compact.Cancelled" xml:space="preserve"><value>Administrator rights were not given: nothing changed.</value></data>
   <data name="Compact.Failed" xml:space="preserve"><value>diskpart could not compact the disk; it was detached again. See the log.</value></data>
+  <data name="Title.Dupe" xml:space="preserve"><value>{0} ({1}), the same file as in {2}</value></data>
+  <data name="Note.Dupe" xml:space="preserve"><value>The copy at {0} stays; this one becomes a hardlink to it, so both programs keep working</value></data>
+  <data name="Rebuild.Hardlink" xml:space="preserve"><value>Stays as a hardlink</value></data>
+  <data name="Move.LinkFailed" xml:space="preserve"><value>the hardlink could not be made: the file went back</value></data>
+  <data name="History.dedupe" xml:space="preserve"><value>Duplicate</value></data>
+  <data name="Confirm.WarnDupes" xml:space="preserve"><value>{0} duplicate files will become hardlinks to the kept copies. If a program later edits such a file in place, the other program sees the change too.</value></data>
 </root>

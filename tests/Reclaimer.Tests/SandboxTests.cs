@@ -41,6 +41,9 @@ public class SandboxTests
         Assert.HasCount(1, units.Single(u => u.Id.Contains("|incomplete|")).Parts);
         foreach (var id in new[] { "torch-hub", "llama-cpp", "gradle", "go-mod", "yarn" })
             Assert.IsTrue(units.Any(u => u.Location == id), id);
+        var dupe = units.Single(u => u.Location == "dupe");
+        Assert.AreEqual("same-weights.safetensors", Path.GetFileName(dupe.Path));
+        StringAssert.Contains(dupe.DedupeOf!, @"ollama\models\blobs\sha256-");
         Assert.IsTrue(units.All(u => u.Parts.All(p => p.Path.StartsWith(Quarantine.SandboxDir, StringComparison.OrdinalIgnoreCase) || u.Location == "lmstudio")));
     }
 }

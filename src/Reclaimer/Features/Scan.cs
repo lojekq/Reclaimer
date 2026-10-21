@@ -49,6 +49,13 @@ public static class Scan
             catch (Exception e) when (e is not OperationCanceledException) { Log.Warn($"scan {job.Name} failed: {Fs.Describe(e)}"); }
             return ValueTask.CompletedTask;
         });
+        step("duplicates");
+        try
+        {
+            foreach (var u in Dupes.Find(Dupes.Collect(), ct))
+                if (Finish(u, names)) found(u);
+        }
+        catch (Exception e) when (e is not OperationCanceledException) { Log.Warn($"scan duplicates failed: {Fs.Describe(e)}"); }
         return VhdxScanner.Scan(names);
     }
 
