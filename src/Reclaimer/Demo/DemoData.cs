@@ -72,12 +72,12 @@ public static class DemoData
     {
         var l = Catalog.All.ToDictionary(x => x.Id);
         Unit U(string loc, Category c, string title, string path, double gb, int days, UsedSource src, string? rebuild = null, string? marker = null,
-            UnitStatus status = UnitStatus.Ready, string? owner = null, string[]? notes = null, bool approx = false) => new()
+            UnitStatus status = UnitStatus.Ready, string? owner = null, string[]? notes = null, bool approx = false, string? dedupe = null) => new()
         {
             Id = "demo|" + path, Location = loc, Category = c, Title = title, Root = Home, Path = path,
             Parts = [new(path, true, (long)(gb * GB))], Bytes = (long)(gb * GB), LastUsed = DateTime.UtcNow.AddDays(-days).AddHours(-3), Source = src,
             Rebuild = rebuild ?? (l.TryGetValue(loc, out var x) ? x.Rebuild : null), Marker = marker, Status = status, Owner = owner,
-            Notes = [.. notes ?? []], Approximate = approx,
+            Notes = [.. notes ?? []], Approximate = approx, DedupeOf = dedupe,
         };
         var p = Home + @"\source";
         return
@@ -87,6 +87,9 @@ public static class DemoData
             U("hf-hub", Category.Models, "models--black-forest-labs--FLUX.1-dev", Home + @"\.cache\huggingface\hub\models--black-forest-labs--FLUX.1-dev", 23.8, 96, UsedSource.Modified),
             U("lmstudio", Category.Models, "Qwen3-32B-Q4_K_M.gguf", Home + @"\.lmstudio\models\Qwen\Qwen3-32B-GGUF\Qwen3-32B-Q4_K_M.gguf", 19.8, 152, UsedSource.Modified,
                 status: UnitStatus.OwnerRunning, owner: "LM Studio"),
+            U("dupe", Category.Models, string.Format(Loc.T("Title.Dupe"), "gemma-3-12b-it-Q4_K_M.gguf", "LM Studio", "Ollama"),
+                Home + @"\.lmstudio\models\lmstudio-community\gemma-3-12b-it-GGUF\gemma-3-12b-it-Q4_K_M.gguf", 7.3, 61, UsedSource.Modified, "Rebuild.Hardlink",
+                notes: [string.Format(Loc.T("Note.Dupe"), Home + @"\.ollama\modelslobs\sha256-adca500f")], dedupe: Home + @"\.ollama\modelslobs\sha256-adca500f"),
             U("ollama", Category.Models, "mistral-nemo:12b", Home + @"\.ollama\models\manifests\registry.ollama.ai\library\mistral-nemo\12b", 7.1, 41, UsedSource.Accessed),
             U("models-custom", Category.Models, "sd_xl_base_1.0.safetensors", @"D:\ComfyUI\models\checkpoints\sd_xl_base_1.0.safetensors", 5.4, 210, UsedSource.Modified, "Rebuild.Download"),
             U("uv", Category.Caches, Loc.T("Title.uv"), Home + @"\AppData\Local\uv\cache", 6.1, 112, UsedSource.Modified, notes: [Loc.T("Note.Hardlinks")], approx: true),

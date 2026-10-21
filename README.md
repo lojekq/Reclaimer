@@ -26,12 +26,13 @@ Generic cleaners don't know these places, and "biggest files" tools leave you gu
 
 ## Features
 
-- **Knows the places** — Hugging Face, Ollama, LM Studio, ComfyUI, pip, uv, npm, pnpm, NuGet and Cargo, plus model folders you add.
+- **Knows the places** — Hugging Face (old revisions and unfinished downloads too), Ollama, LM Studio, ComfyUI, llama.cpp, PyTorch hub, pip, uv, npm, pnpm, Yarn, NuGet, Cargo, Gradle, Maven and Go, plus folders you add.
 - **Stale projects** — `node_modules`, `target`, `bin`/`obj`, `.venv`, `.next` in projects untouched for 90+ days, with the last commit date.
-- **Honest "last used"** — and how it knows: last commit, modified, opened (only when NTFS records it), or "unknown".
-- **7-day undo** — moved items wait in a quarantine on the same disk; one click brings them back.
+- **Honest "last used"** — and how it knows: last commit, last Ollama run, modified, opened (only when NTFS records it), or "unknown".
+- **7-day undo, full history** — moved items wait in a quarantine on the same disk and come back with one click; History lists every action and the space it freed, and the findings export to Markdown.
 - **Whitelist only** — it never touches anything outside known places and won't move models while Ollama or LM Studio is running.
-- **WSL and Docker disks** — shows how big your `ext4.vhdx` and `docker_data.vhdx` really are (report only).
+- **Same weights twice** — a GGUF kept by both Ollama and LM Studio becomes one file with two names (a hardlink), and both keep working.
+- **WSL and Docker** — compacts `ext4.vhdx` and `docker_data.vhdx`, shows `docker system df` and clears the build cache and dangling images.
 
 ## See it in action
 
@@ -45,6 +46,7 @@ Generic cleaners don't know these places, and "biggest files" tools leave you gu
 | Confirmation | ![Confirmation, light](docs/confirm-light-en.png) | ![Confirmation, dark](docs/confirm-dark-en.png) |
 | Quarantine | ![Quarantine, light](docs/quarantine-light-en.png) | ![Quarantine, dark](docs/quarantine-dark-en.png) |
 | WSL and Docker | ![WSL and Docker, light](docs/disks-light-en.png) | ![WSL and Docker, dark](docs/disks-dark-en.png) |
+| History | ![History, light](docs/history-light-en.png) | ![History, dark](docs/history-dark-en.png) |
 
 ## How it works
 
@@ -80,6 +82,7 @@ On the first start Windows may show a SmartScreen warning (see FAQ). Add your pr
 | Model folders | none | ComfyUI `models`, GGUF folders: files of 100 MB and more |
 | Own cache folders | none | Moved as a whole: only folders a tool refills by itself |
 | Excluded folders | none | Never scanned or moved |
+| Weekly reminder | off | Once a week a quiet scan tells how much can be reclaimed, if it is 1 GB or more |
 | Language, theme, Start with Windows, Start menu shortcut, check for updates | | As in every app of the set |
 
 Settings, the action history (`history.jsonl`) and logs live in `%APPDATA%\Reclaimer`. The quarantine is `%LOCALAPPDATA%\Reclaimer\Quarantine` on the system disk and a hidden `.reclaimer-quarantine` folder on other disks.
@@ -110,6 +113,22 @@ For pnpm and uv some files may be hardlinks shared with projects, so the freed s
 Reclaimer doesn't close programs. Close Ollama, LM Studio, the build or whatever holds the files, then press **Check again**. A row "Not in .gitignore" is a folder git tracks: it may hold your own files, so it can't be picked.
 </details>
 
+<details><summary>How does compacting a WSL or Docker disk work?</summary>
+
+These disks grow but never shrink by themselves. **Compact…** optionally runs `fstrim` inside the distribution, asks you to quit Docker Desktop, shuts WSL down (`wsl --shutdown` stops every distribution, so it asks first), and then Windows asks for administrator rights for `diskpart`: the disk is attached read-only, compacted and detached.
+Only that step runs as administrator, in a separate `Reclaimer.exe --compact-vhdx` process that accepts nothing but a disk Reclaimer itself found. Nothing inside the disk is deleted.
+</details>
+
+<details><summary>Duplicates: what if a program changes the file?</summary>
+
+The kept copy is the one in Ollama or Hugging Face: they never edit a blob in place. If another program edited such a file in place, both would see the change, and the confirmation says so. **Restore** removes the hardlink and puts the separate copy back.
+</details>
+
+<details><summary>The Docker buttons</summary>
+
+`docker builder prune -f` and `docker image prune -f` (dangling images only) delete for good, without the quarantine; the buttons and the confirmation say so. Volumes and `system prune -a` are never touched.
+</details>
+
 <details><summary>Controlled folder access blocked the move</summary>
 
 Windows Security protects Documents, Desktop and other folders from programs it doesn't know. Nothing was changed. To allow it: Windows Security → Virus &amp; threat protection → Ransomware protection → Allow an app through Controlled folder access.
@@ -123,7 +142,8 @@ First restore or clean the quarantine: **Remove data and autostart** refuses whi
 ## Privacy
 
 No telemetry. The only network request is the update check: `GET https://api.github.com/repos/lojekq/Reclaimer/releases/latest` once a day; turn it off in Settings.
-It runs `git.exe` (with `core.fsmonitor=false`) to ask whether a folder is ignored and when the last commit was, and `wsl.exe --list --running`; both stay on this PC.
+It runs `git.exe` (with `core.fsmonitor=false`) to ask whether a folder is ignored and when the last commit was, `wsl.exe --list --running` and `docker system df`; on your request also the Docker prunes, `fstrim`, `wsl --shutdown` and `diskpart`. All of it stays on this PC.
+It reads Ollama's `server*.log` to know when a model last ran.
 `history.jsonl` keeps the paths of what was moved, restored and deleted on this PC. Logs contain no paths.
 
 ## Build from source

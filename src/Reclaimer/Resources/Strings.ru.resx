@@ -270,7 +270,7 @@
   <data name="Compact.Refused" xml:space="preserve"><value>Этот файл не диск WSL или Docker, известный Reclaimer.</value></data>
   <data name="Compact.Cancelled" xml:space="preserve"><value>Права администратора не выданы: ничего не изменилось.</value></data>
   <data name="Compact.Failed" xml:space="preserve"><value>diskpart не смог сжать диск; диск отключён обратно. Подробности в логе.</value></data>
-  <data name="Title.Dupe" xml:space="preserve"><value>{0} ({1}), тот же файл, что в {2}</value></data>
+  <data name="Title.Dupe" xml:space="preserve"><value>{0}: дубль из {2}</value></data>
   <data name="Note.Dupe" xml:space="preserve"><value>Копия {0} остаётся; эта станет хардлинком на неё, обе программы продолжат работать</value></data>
   <data name="Rebuild.Hardlink" xml:space="preserve"><value>Остаётся хардлинком</value></data>
   <data name="Move.LinkFailed" xml:space="preserve"><value>не удалось создать хардлинк: файл возвращён на место</value></data>
