@@ -42,3 +42,6 @@ CoTaskMemFree
 WINEVENT_OUTOFCONTEXT
 WINEVENT_SKIPOWNPROCESS
 UNICODE_STRING
+// Reclaimer: Native.cs
+MoveFileEx
+GetVolumePathName

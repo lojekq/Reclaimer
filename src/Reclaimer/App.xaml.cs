@@ -37,9 +37,7 @@ public partial class App : Application
         if (a.Demo) DemoData.Fill();
         else if (Install.IsInstalled) InstalledStart(); // Debug builds and exes in Downloads write nothing by themselves
 
-        // App features: services, hotkeys, tray items, settings section (template sample below)
-        SettingsPage.AppSection = SampleSettings.Create;
-        SampleSettings.Apply();
+        // App features: services, hotkeys, tray items, settings section
 
         window = new MainWindow();
         if (a.Width > 0) (window.Width, window.Height) = (a.Width, a.Height);

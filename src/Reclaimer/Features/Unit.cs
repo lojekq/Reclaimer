@@ -1,0 +1,55 @@
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace Reclaimer.Features;
+
+public enum Category { Models, Caches, Projects, Disks }
+
+/// <summary>How "last used" is known: last commit, newest mtime, newest atime (only when NTFS writes it), or not at all.</summary>
+public enum UsedSource { Unknown, Commit, Modified, Accessed }
+
+public enum UnitStatus { Ready, OwnerRunning, FilesBusy, NotIgnored, CloudFolder, NoQuarantine, ReportOnly }
+
+/// <summary>One path of a unit. Mtime is the path's own LastWriteTimeUtc at scan time: a change before the move = skip.</summary>
+public sealed record Part(string Path, bool IsDir, long Bytes, DateTime MtimeUtc = default);
+
+/// <summary>
+/// What moves as one: an Ollama model is its manifest plus the blobs no other manifest uses, a project's bin+obj is one unit.
+/// Root is the whitelisted folder the unit was found in; PathGuard checks every part against it, at scan and right before the move.
+/// </summary>
+public sealed class Unit : INotifyPropertyChanged
+{
+    public required string Id { get; init; }
+    public required string Location { get; init; }      // Catalog id, "project", "models-custom", "cache-custom"
+    public required Category Category { get; init; }
+    public required string Title { get; init; }
+    public required string Root { get; init; }
+    public required IReadOnlyList<Part> Parts { get; init; }
+    public long Bytes { get; init; }
+    public DateTime? LastUsed { get; init; }            // UTC
+    public UsedSource Source { get; init; }
+    public string[] Owners { get; init; } = [];          // process name prefixes that block the move
+    public string? Rebuild { get; init; }               // Loc key: how it comes back
+    public string? Marker { get; init; }                // project marker found, e.g. package.json
+    public List<string> Notes { get; init; } = [];      // already localized lines for the details panel
+    public bool Approximate { get; init; }              // hardlinks, block cloning: freed space may be smaller
+
+    UnitStatus status;
+    public UnitStatus Status { get => status; set { status = value; Changed(); Changed(nameof(CanSelect)); } }
+
+    string? owner;
+    public string? Owner { get => owner; set { owner = value; Changed(); } } // the running owner, for "Close Ollama"
+
+    bool selected;
+    public bool Selected { get => selected; set { if (value && !CanSelect) return; selected = value; Changed(); } }
+
+    public bool CanSelect => Status == UnitStatus.Ready;
+
+    readonly string? path;
+    public string Path { get => path ?? Parts[^1].Path; init => path = value; } // what people recognise; by default the last part
+
+    public int? AgeDays => LastUsed is { } t ? (int)Math.Max(0, (DateTime.UtcNow - t).TotalDays) : null;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+    void Changed([CallerMemberName] string? p = null) => PropertyChanged?.Invoke(this, new(p));
+}
