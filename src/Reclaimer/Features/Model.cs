@@ -31,6 +31,10 @@ public sealed class Model : INotifyPropertyChanged
     public ObservableCollection<VolumeView> Volumes { get; } = [];
     public ObservableCollection<TileView> Tiles { get; } = [];
     public ObservableCollection<HistoryRow> History { get; } = [];
+    public ObservableCollection<DockerRow> DockerRows { get; } = [];
+
+    string dockerText = "";
+    public string DockerText { get => dockerText; set { dockerText = value; Changed(); } }
 
     bool scanning;
     public bool Scanning { get => scanning; private set { scanning = value; Changed(); Changed(nameof(Idle)); } }
@@ -116,6 +120,7 @@ public sealed class Model : INotifyPropertyChanged
                     step => OnUi(() => ScanText = string.Format(Loc.T("Scan.Step"), step)),
                     scanCts.Token));
                 foreach (var d in disks) Disks.Add(d);
+                await RefreshDocker();
                 Settings.Current.LastScanUtc = DateTime.UtcNow;
                 Settings.Save();
             }
@@ -135,6 +140,29 @@ public sealed class Model : INotifyPropertyChanged
     }
 
     public void CancelScan() => scanCts?.Cancel();
+
+    async Task RefreshDocker()
+    {
+        var df = await Task.Run(Docker.Df);
+        DockerRows.Clear();
+        foreach (var r in df ?? []) DockerRows.Add(r);
+        DockerText = df is null ? Loc.T("Docker.None") : "";
+    }
+
+    /// <summary>Build cache or dangling images: deleted for good, no quarantine (the button says so and asks first).</summary>
+    public async Task PruneDockerAsync(bool buildCache)
+    {
+        if (Busy) return;
+        if (Args.Current.Demo) { DockerText = string.Format(Loc.T("Docker.Reclaimed"), buildCache ? "7.8GB" : "9.1GB"); return; }
+        Busy = true;
+        try
+        {
+            var total = await Task.Run(() => Docker.Prune(buildCache));
+            await RefreshDocker();
+            DockerText = total is null ? Loc.T("Docker.Failed") : string.Format(Loc.T("Docker.Reclaimed"), total.Length > 0 ? total : "0B");
+        }
+        finally { Busy = false; }
+    }
 
     /// <summary>"Check again" after the user closed Ollama: owners only, no rescan.</summary>
     public void RecheckOwners()

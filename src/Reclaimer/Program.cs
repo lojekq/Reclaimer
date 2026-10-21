@@ -9,6 +9,7 @@ public static class Program
     // Example: ["--snapshot"] = Snapshot.Run,
     internal static readonly Dictionary<string, Func<string[], int>> Verbs = new()
     {
+        [Features.VhdxCompact.Verb] = Features.VhdxCompact.Run, // elevated helper of the compaction wizard (v1.0)
     };
 
     [STAThread]

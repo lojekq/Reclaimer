@@ -72,6 +72,38 @@ public class V1Tests
     }
 
     [TestMethod]
+    public void DockerOutputIsParsed()
+    {
+        var rows = Docker.Parse("""
+            {"Active":"3","Reclaimable":"8.2GB (78%)","Size":"10.5GB","TotalCount":"12","Type":"Images"}
+            not json
+            {"Active":"0","Reclaimable":"1.1GB","Size":"1.1GB","TotalCount":"40","Type":"Build Cache"}
+            """);
+        Assert.HasCount(2, rows);
+        Assert.AreEqual(new DockerRow("Images", "10.5GB", "8.2GB (78%)"), rows[0]);
+        Assert.AreEqual("1.2GB", Docker.Reclaimed("Deleted build cache objects:\nabc\n\nTotal reclaimed space: 1.2GB\n"));
+        Assert.IsNull(Docker.Reclaimed("error during connect"));
+    }
+
+    [TestMethod]
+    public void CompactVerbTrustsOnlyKnownDisks()
+    {
+        var vhdx = Mk(@"wsl\ext4.vhdx", "not really a disk");
+        Assert.IsTrue(VhdxCompact.Allowed(vhdx, [vhdx.ToUpperInvariant()]));
+        Assert.IsFalse(VhdxCompact.Allowed(vhdx, []));                                    // not a disk Reclaimer found
+        Assert.IsFalse(VhdxCompact.Allowed(Mk(@"wsl\x.vhd", "x"), [Path.Combine(dir, @"wsl\x.vhd")]));
+        var quoted = Path.Combine(dir, "a\"b.vhdx");
+        Assert.IsFalse(VhdxCompact.Allowed(quoted, [quoted]));                            // would break out of the diskpart script
+        Assert.IsFalse(VhdxCompact.Allowed(@"wsl\ext4.vhdx", [@"wsl\ext4.vhdx"]));
+        Assert.AreEqual(2, VhdxCompact.Run([vhdx]));                                      // the verb refuses before anything else
+        Assert.AreEqual(2, VhdxCompact.Run([]));
+
+        var (compact, detach) = VhdxCompact.Scripts(@"C:\wsl\ext4.vhdx");
+        Assert.AreEqual("select vdisk file=\"C:\\wsl\\ext4.vhdx\"\r\nattach vdisk readonly\r\ncompact vdisk\r\n", compact);
+        StringAssert.Contains(detach, "detach vdisk noerr");
+    }
+
+    [TestMethod]
     public void HfOldRevisionsAndUnfinishedDownloads()
     {
         var hub = Path.Combine(dir, "hub");

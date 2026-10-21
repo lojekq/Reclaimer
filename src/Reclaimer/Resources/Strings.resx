@@ -191,7 +191,7 @@ Open the folder?</value></data>
   <data name="Tray.Clean" xml:space="preserve"><value>Clean quarantine now…</value></data>
   <data name="Tray.Tooltip" xml:space="preserve"><value>{0}: {1} in quarantine</value></data>
   <data name="Remove.NotEmpty" xml:space="preserve"><value>Restore or clean the quarantine first ({0}): its journal would be deleted with the data.</value></data>
-  <data name="Disks.Subtitle" xml:space="preserve"><value>WSL distributions and the Docker Desktop disk. Report only: these files only grow, compacting them comes in v1.0.</value></data>
+  <data name="Disks.Subtitle" xml:space="preserve"><value>WSL distributions and the Docker Desktop disk. These files only grow: compacting gives back the space they no longer use inside.</value></data>
   <data name="Disks.Empty" xml:space="preserve"><value>No WSL or Docker disks found yet. Run a scan.</value></data>
   <data name="Disks.Sparse" xml:space="preserve"><value>Sparse</value></data>
   <data name="Disks.Running" xml:space="preserve"><value>Running</value></data>
@@ -241,4 +241,33 @@ Open the folder?</value></data>
   <data name="Report.Path" xml:space="preserve"><value>Path</value></data>
   <data name="Settings.Remind" xml:space="preserve"><value>Weekly reminder of how much can be reclaimed</value></data>
   <data name="Notify.Remind" xml:space="preserve"><value>≈ {0} can be reclaimed: things you haven't used for a while</value></data>
+  <data name="Docker.Reclaimable" xml:space="preserve"><value>can free {0}</value></data>
+  <data name="Docker.None" xml:space="preserve"><value>Docker is not installed or not running.</value></data>
+  <data name="Docker.Failed" xml:space="preserve"><value>Docker did not finish the cleanup, see the log.</value></data>
+  <data name="Docker.Reclaimed" xml:space="preserve"><value>Docker freed {0}.</value></data>
+  <data name="Docker.PruneBuild" xml:space="preserve"><value>Delete build cache…</value></data>
+  <data name="Docker.PruneImages" xml:space="preserve"><value>Delete dangling images…</value></data>
+  <data name="Docker.Note" xml:space="preserve"><value>These buttons delete for good, without the quarantine. Volumes are never touched.</value></data>
+  <data name="Docker.ConfirmTitle" xml:space="preserve"><value>Delete without the quarantine?</value></data>
+  <data name="Docker.ConfirmText" xml:space="preserve"><value>Reclaimer will run "{0}". Docker deletes this for good: there is no undo. Volumes and running containers are not touched.</value></data>
+  <data name="Disks.Compact" xml:space="preserve"><value>Compact…</value></data>
+  <data name="Compact.Title" xml:space="preserve"><value>Compact the disk?</value></data>
+  <data name="Compact.Intro" xml:space="preserve"><value>{0} takes {1}. Compacting gives back the space it no longer uses inside; nothing inside the disk is deleted.</value></data>
+  <data name="Compact.Steps" xml:space="preserve"><value>Steps: fstrim inside the distribution (optional), then WSL shuts down, then Windows asks for administrator rights for diskpart. It can take several minutes.</value></data>
+  <data name="Compact.Fstrim" xml:space="preserve"><value>Run fstrim inside the distribution first (frees more)</value></data>
+  <data name="Compact.Continue" xml:space="preserve"><value>Continue</value></data>
+  <data name="Compact.CloseDockerTitle" xml:space="preserve"><value>Close Docker Desktop</value></data>
+  <data name="Compact.CloseDocker" xml:space="preserve"><value>Docker Desktop is running. Quit it from its tray icon, then press Check again. Reclaimer does not close programs itself.</value></data>
+  <data name="Compact.ShutdownTitle" xml:space="preserve"><value>Shut down WSL?</value></data>
+  <data name="Compact.ShutdownText" xml:space="preserve"><value>"wsl --shutdown" stops every WSL distribution and Docker on this PC. Save your work in them first.</value></data>
+  <data name="Compact.Go" xml:space="preserve"><value>Shut down WSL and compact</value></data>
+  <data name="Compact.Done" xml:space="preserve"><value>Disk compacted</value></data>
+  <data name="Compact.FailedTitle" xml:space="preserve"><value>Not compacted</value></data>
+  <data name="Compact.Result" xml:space="preserve"><value>Before {0}, after {1}: {2} came back.</value></data>
+  <data name="Compact.Debug" xml:space="preserve"><value>The Debug build does not compact disks: wsl --shutdown would stop WSL for the whole PC.</value></data>
+  <data name="Compact.ShutdownFailed" xml:space="preserve"><value>WSL did not shut down.</value></data>
+  <data name="Compact.InUse" xml:space="preserve"><value>The disk file is still in use: close what uses WSL or Docker and try again.</value></data>
+  <data name="Compact.Refused" xml:space="preserve"><value>This file is not a WSL or Docker disk Reclaimer knows.</value></data>
+  <data name="Compact.Cancelled" xml:space="preserve"><value>Administrator rights were not given: nothing changed.</value></data>
+  <data name="Compact.Failed" xml:space="preserve"><value>diskpart could not compact the disk; it was detached again. See the log.</value></data>
 </root>

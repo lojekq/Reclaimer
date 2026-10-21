@@ -22,6 +22,7 @@ public static class DemoData
         if (Args.Current.Autoplay) return; // the GIF starts from an empty table and an empty quarantine
         foreach (var u in Units()) m.Units.Add(u);
         foreach (var d in Disks()) m.Disks.Add(d);
+        foreach (var r in DockerRows) m.DockerRows.Add(r);
         foreach (var e in Entries()) m.Entries.Add(e);
         // 7 rows, ≈ 58.3 GB: one model by hand, two caches, the old projects
         foreach (var u in m.Units.Where(u => u.Title == "llama3.1:70b" || u.Location is "uv" or "npm" || u.Category == Category.Projects && u.AgeDays > 90 && u.CanSelect))
@@ -111,6 +112,12 @@ public static class DemoData
     [
         new("Ubuntu-24.04", Home + @"\AppData\Local\wsl\{3f2b7c1e-demo}\ext4.vhdx", (long)(48.2 * GB), false, true),
         new("Docker Desktop", Home + @"\AppData\Local\Docker\wsl\disk\docker_data.vhdx", (long)(31.7 * GB), false, false),
+    ];
+
+    static readonly DockerRow[] DockerRows =
+    [
+        new("Images", "18.4GB", "9.1GB (49%)"), new("Containers", "220MB", "0B (0%)"),
+        new("Local Volumes", "6.3GB", "1.2GB (19%)"), new("Build Cache", "7.8GB", "7.8GB"),
     ];
 
     static IEnumerable<Entry> Entries()

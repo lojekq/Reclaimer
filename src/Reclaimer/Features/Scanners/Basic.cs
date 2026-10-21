@@ -65,33 +65,36 @@ public sealed record Disk(string Name, string Path, long Bytes, bool Sparse, boo
 
 public static class VhdxScanner
 {
+    public const string DockerName = "Docker Desktop";
+
     public static List<Disk> Scan(string[] processNames)
     {
         var running = OwnerCheck.WslRunning();
+        var dockerUp = running.Contains("docker-desktop") || OwnerCheck.Running([DockerName, "com.docker.backend"], processNames) is not null;
         var disks = new List<Disk>();
+        foreach (var (name, file) in Candidates())
+            try
+            {
+                var f = new FileInfo(file);
+                if (f.Exists) disks.Add(new(name, f.FullName, f.Length, f.Attributes.HasFlag(FileAttributes.SparseFile), name == DockerName ? dockerUp : running.Contains(name)));
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException) { }
+        return disks;
+    }
+
+    /// <summary>Every WSL distribution's disk (HKCU Lxss: BasePath + VhdFileName) and Docker Desktop's, old and new layout. Files may not exist.</summary>
+    public static IEnumerable<(string Name, string Path)> Candidates()
+    {
         using (var lxss = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Lxss"))
             foreach (var id in lxss?.GetSubKeyNames() ?? [])
             {
                 using var k = lxss!.OpenSubKey(id);
                 if (k?.GetValue("BasePath") is not string basePath) continue;
                 var name = k.GetValue("DistributionName") as string ?? id;
-                var file = Path.Combine(basePath.StartsWith(@"\\?\") ? basePath[4..] : basePath, k.GetValue("VhdFileName") as string ?? "ext4.vhdx");
-                Add(name, file, running.Contains(name));
+                yield return (name, Path.Combine(basePath.StartsWith(@"\?\") ? basePath[4..] : basePath, k.GetValue("VhdFileName") as string ?? "ext4.vhdx"));
             }
         var docker = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Docker\wsl";
-        var dockerUp = running.Contains("docker-desktop") || OwnerCheck.Running(["Docker Desktop", "com.docker.backend"], processNames) is not null;
-        Add("Docker Desktop", docker + @"\disk\docker_data.vhdx", dockerUp); // the older layout is wsl\data\ext4.vhdx: both are looked for
-        Add("Docker Desktop", docker + @"\data\ext4.vhdx", dockerUp);
-        return disks;
-
-        void Add(string name, string file, bool up)
-        {
-            try
-            {
-                var f = new FileInfo(file);
-                if (f.Exists) disks.Add(new(name, f.FullName, f.Length, f.Attributes.HasFlag(FileAttributes.SparseFile), up));
-            }
-            catch (Exception e) when (e is IOException or UnauthorizedAccessException) { }
-        }
+        yield return (DockerName, docker + @"\disk\docker_data.vhdx");
+        yield return (DockerName, docker + @"\data\ext4.vhdx");
     }
 }
