@@ -32,6 +32,20 @@ foreach ($r in @(@{ n = 'models--demo--tiny-llama'; mb = 220; days = 160 }, @{ n
   Old (Join-Path $S "huggingface\hub\$($r.n)") $r.days
 }
 Text 'huggingface\xet\shard-cache\a.shard' 'x' | Out-Null
+# v1.0: an old revision no ref points at, and a download left unfinished three days ago
+Big 'huggingface\hub\models--demo--tiny-llama\snapshots\0ld0ld0ld0ld0ld0ld0ld0ld0ld0ld0ld0ld0ld0\model.safetensors' 70 | Out-Null
+$inc = Big 'huggingface\hub\models--demo--whisper-small\blobs\0123abcd.incomplete' 30
+(Get-Item $inc).LastWriteTime = (Get-Date).AddDays(-3)
+
+# Catalog+ (v1.0): PyTorch hub, llama.cpp cache, Gradle, Go modules (read-only files, as Go makes them), Yarn
+Big 'torch\hub\checkpoints\resnet50.pth' 95 | Out-Null
+Big 'llama.cpp\demo_tiny-GGUF_tiny-q4_k_m.gguf' 110 | Out-Null
+Big 'gradle\caches\modules-2\files-2.1\com.example\lib.jar' 52 | Out-Null
+$go = Big 'go\pkg\mod\cache\download\example.com\m\@v\v1.0.0.zip' 51
+Text 'go\pkg\mod\example.com\m@v1.0.0\go.mod' 'module example.com/m' | Out-Null
+Get-ChildItem (Join-Path $S 'go\pkg\mod') -Recurse -File | ForEach-Object { $_.IsReadOnly = $true }
+Big 'yarn\cache\lodash-npm-4.17.21.zip' 53 | Out-Null
+foreach ($d in 'torch', 'llama.cpp', 'gradle', 'go', 'yarn') { Old (Join-Path $S $d) 120 }
 
 # Ollama: tinyllama:latest and tinyllama:q8 share the license layer; one orphan blob
 $cfg1 = Sha 'cfg1'; $cfg2 = Sha 'cfg2'; $w1 = Sha 'weights1'; $w2 = Sha 'weights2'; $lic = Sha 'license'; $orphan = Sha 'orphan'

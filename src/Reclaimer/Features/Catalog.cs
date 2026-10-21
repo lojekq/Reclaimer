@@ -27,6 +27,13 @@ public static class Catalog
         new("nuget-http", Category.Caches, Kind.Whole, [@"%LOCALAPPDATA%\NuGet\v3-cache"], [("NUGET_HTTP_CACHE_PATH", "")], NuGetOwners, "Rebuild.Restore"),
         new("cargo-cache", Category.Caches, Kind.Whole, [@"%USERPROFILE%\.cargo\registry\cache"], [("CARGO_HOME", @"registry\cache")], ["cargo", "rustc"], "Rebuild.Cache"),
         new("cargo-src", Category.Caches, Kind.Whole, [@"%USERPROFILE%\.cargo\registry\src"], [("CARGO_HOME", @"registry\src")], ["cargo", "rustc"], "Rebuild.Cache"),
+        // Catalog+ (v1.0). No owner for Gradle (its daemon is a plain java.exe) or Go ("go" would match half the process list): file locks guard them
+        new("torch-hub", Category.Models, Kind.Whole, [@"%USERPROFILE%\.cache\torch\hub"], [("TORCH_HOME", "hub")], [], "Rebuild.Download"),
+        new("llama-cpp", Category.Models, Kind.ModelFiles, [@"%LOCALAPPDATA%\llama.cpp"], [("LLAMA_CACHE", "")], ["llama-server", "llama-cli"], "Rebuild.Download"),
+        new("gradle", Category.Caches, Kind.Whole, [@"%USERPROFILE%\.gradle\caches"], [("GRADLE_USER_HOME", "caches")], [], "Rebuild.Cache"),
+        new("maven", Category.Caches, Kind.Whole, [@"%USERPROFILE%\.m2\repository"], [], [], "Rebuild.Cache"),
+        new("go-mod", Category.Caches, Kind.Whole, [@"%USERPROFILE%\go\pkg\mod"], [("GOMODCACHE", ""), ("GOPATH", @"pkg\mod")], [], "Rebuild.Cache"),
+        new("yarn", Category.Caches, Kind.Whole, [@"%LOCALAPPDATA%\Yarn\Berry\cache"], [("YARN_CACHE_FOLDER", "")], [], "Rebuild.Cache"),
     ];
 
     /// <summary>Existing folders of a location: the first set variable wins, otherwise the defaults.</summary>

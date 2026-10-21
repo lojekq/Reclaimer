@@ -36,6 +36,11 @@ public class SandboxTests
         Assert.IsTrue(t.ContainsKey("demo-sd15.safetensors"));
         Assert.IsFalse(t.ContainsKey("tiny.safetensors"));                       // under 100 MB
         Assert.IsTrue(units.Any(u => u.Location == "npm") && units.Any(u => u.Location == "nuget"));
+        // v1.0
+        Assert.AreEqual(70L << 20, units.Single(u => u.Id.Contains("|detached|")).Bytes);
+        Assert.HasCount(1, units.Single(u => u.Id.Contains("|incomplete|")).Parts);
+        foreach (var id in new[] { "torch-hub", "llama-cpp", "gradle", "go-mod", "yarn" })
+            Assert.IsTrue(units.Any(u => u.Location == id), id);
         Assert.IsTrue(units.All(u => u.Parts.All(p => p.Path.StartsWith(Quarantine.SandboxDir, StringComparison.OrdinalIgnoreCase) || u.Location == "lmstudio")));
     }
 }

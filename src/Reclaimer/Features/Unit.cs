@@ -6,8 +6,8 @@ namespace Reclaimer.Features;
 
 public enum Category { Models, Caches, Projects, Disks }
 
-/// <summary>How "last used" is known: last commit, newest mtime, newest atime (only when NTFS writes it), or not at all.</summary>
-public enum UsedSource { Unknown, Commit, Modified, Accessed }
+/// <summary>How "last used" is known: last commit, newest mtime, newest atime (only when NTFS writes it), Ollama's log, or not at all.</summary>
+public enum UsedSource { Unknown, Commit, Modified, Accessed, Ran }
 
 public enum UnitStatus { Ready, OwnerRunning, FilesBusy, NotIgnored, CloudFolder, NoQuarantine, ReportOnly }
 

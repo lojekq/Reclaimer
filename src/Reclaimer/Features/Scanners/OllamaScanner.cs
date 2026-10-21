@@ -15,6 +15,13 @@ public static partial class OllamaScanner
     [GeneratedRegex("^sha256[:-]([0-9a-f]{64})$")]
     private static partial Regex Digest();
 
+    /// <summary>A model load in server.log: "time=… starting llama-server cmd=… --model …\sha256-…" or "loading model … model=…\sha256-…".</summary>
+    [GeneratedRegex(@"^time=(\S+) .*?(?:--model |model=)\S*?sha256-([0-9a-f]{64})")]
+    private static partial Regex RunLine();
+
+    /// <summary>Where Ollama writes server.log and server-1..5.log. Tests replace it.</summary>
+    internal static string LogDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Ollama");
+
     public static List<Unit> Scan(string models, Location l, bool ollamaRunning, CancellationToken ct)
     {
         var manifestDir = Path.Combine(models, "manifests");
@@ -23,6 +30,7 @@ public static partial class OllamaScanner
             ? Directory.EnumerateFiles(manifestDir, "*", Fs.Deep).Select(f => (File: f, Blobs: BlobsOf(f, blobDir))).Where(m => m.Blobs is not null).ToList()
             : [];
         var users = manifests.SelectMany(m => m.Blobs!).GroupBy(b => b, StringComparer.OrdinalIgnoreCase).ToDictionary(g => g.Key, g => g.Count(), StringComparer.OrdinalIgnoreCase);
+        var runs = LastRuns(LogDir);
 
         var units = new List<Unit>();
         foreach (var (file, blobs) in manifests)
@@ -34,6 +42,8 @@ public static partial class OllamaScanner
             parts.Add(new(file, false, new FileInfo(file).Length, File.GetLastWriteTimeUtc(file)));
             var stats = new Stats(0, File.GetLastWriteTimeUtc(file), blobs!.Where(File.Exists).Select(File.GetLastAccessTimeUtc).DefaultIfEmpty().Max());
             var (at, source) = Fs.LastUsed(stats); // manifest mtime = pulled; blob atime = loaded (when NTFS writes atime)
+            var ran = blobs!.Select(b => runs.GetValueOrDefault(Path.GetFileName(b)[7..])).DefaultIfEmpty().Max();
+            if (ran > (at ?? default)) (at, source) = (ran, UsedSource.Ran); // the log knows the last run; unknown format = "downloaded" stays
             var freed = parts.Sum(p => p.Bytes);
             units.Add(new Unit
             {
@@ -58,6 +68,29 @@ public static partial class OllamaScanner
                 });
         }
         return units;
+    }
+
+    /// <summary>
+    /// The last time each weights blob was loaded, by digest, from Ollama's server logs (v1.0). The logs are read shared:
+    /// Ollama keeps server.log open. A format it doesn't recognise gives nothing, and the age stays the download date.
+    /// </summary>
+    internal static Dictionary<string, DateTime> LastRuns(string dir)
+    {
+        var runs = new Dictionary<string, DateTime>(StringComparer.OrdinalIgnoreCase);
+        try
+        {
+            if (!Directory.Exists(dir)) return runs;
+            foreach (var f in Directory.EnumerateFiles(dir, "server*.log"))
+            {
+                using var r = new StreamReader(new FileStream(f, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete));
+                while (r.ReadLine() is { } line)
+                    if (line.Contains("sha256-") && RunLine().Match(line) is { Success: true } m && DateTimeOffset.TryParse(m.Groups[1].Value, out var t)
+                        && t.UtcDateTime > runs.GetValueOrDefault(m.Groups[2].Value))
+                        runs[m.Groups[2].Value] = t.UtcDateTime;
+            }
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { Log.Info($"ollama logs unreadable: {e.GetType().Name}"); }
+        return runs;
     }
 
     /// <summary>Blob paths of a manifest (config + layers). Not a manifest or a digest that isn't sha256 hex → null (skipped).</summary>

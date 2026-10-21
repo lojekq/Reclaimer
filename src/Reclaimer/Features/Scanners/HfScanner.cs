@@ -43,17 +43,22 @@ public static class HfScanner
                 Id = $"{l.Id}|{repo}", Location = l.Id, Category = l.Category, Title = Path.GetFileName(repo), Root = hub,
                 Parts = parts, Bytes = parts.Sum(p => p.Bytes), LastUsed = at, Source = source, Owners = l.Owners, Rebuild = l.Rebuild, Notes = notes,
             });
+            if (Detached(hub, repo, l) is { } d) units.Add(d);
         }
+        if (Incomplete(hub, l) is { } inc) units.Add(inc);
         return units;
     }
 
     /// <summary>Files outside the repo but inside the hub that the repo's snapshot symlinks point at.</summary>
-    static HashSet<string> SharedTargets(string hub, string repo)
+    static HashSet<string> SharedTargets(string hub, string repo) =>
+        Targets(Path.Combine(repo, "snapshots")).Where(t => Paths.IsUnder(hub, t) && !Paths.IsUnder(repo, t)).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Where the file symlinks under a folder point, as full paths. Never follows a linked folder.</summary>
+    static HashSet<string> Targets(string dir)
     {
         var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var snapshots = Path.Combine(repo, "snapshots");
-        if (!Directory.Exists(snapshots)) return set;
-        var links = new FileSystemEnumerable<string?>(snapshots, (ref FileSystemEntry e) =>
+        if (!Directory.Exists(dir)) return set;
+        var links = new FileSystemEnumerable<string?>(dir, (ref FileSystemEntry e) =>
             (e.Attributes & FileAttributes.ReparsePoint) != 0 ? e.ToFullPath() : null,
             new EnumerationOptions { RecurseSubdirectories = true, IgnoreInaccessible = true, AttributesToSkip = 0 })
         {
@@ -61,12 +66,50 @@ public static class HfScanner
             ShouldRecursePredicate = (ref FileSystemEntry e) => (e.Attributes & FileAttributes.ReparsePoint) == 0,
         };
         foreach (var link in links)
-        {
-            if (link is null || new FileInfo(link).LinkTarget is not { } target) continue;
-            var full = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(link)!, target));
-            if (Paths.IsUnder(hub, full) && !Paths.IsUnder(repo, full)) set.Add(full);
-        }
+            if (link is not null && new FileInfo(link).LinkTarget is { } target)
+                set.Add(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(link)!, target)));
         return set;
+    }
+
+    /// <summary>
+    /// Revisions no ref points at (an old "main" after an update): their snapshot folders plus the blobs only they use (v1.0).
+    /// A repo without refs is left alone: there is no telling which revision is current.
+    /// </summary>
+    internal static Unit? Detached(string hub, string repo, Location l)
+    {
+        var refsDir = Path.Combine(repo, "refs");
+        var snapsDir = Path.Combine(repo, "snapshots");
+        if (!Directory.Exists(refsDir) || !Directory.Exists(snapsDir)) return null;
+        var current = Directory.EnumerateFiles(refsDir, "*", Fs.Deep).Select(f => File.ReadAllText(f).Trim()).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var snaps = Directory.GetDirectories(snapsDir, "*", Fs.Flat);
+        var old = snaps.Where(d => !current.Contains(Path.GetFileName(d))).ToList();
+        if (old.Count == 0 || old.Count == snaps.Length) return null; // nothing old, or no current revision on disk: keep it all
+        var blobs = Path.Combine(repo, "blobs");
+        var keep = snaps.Except(old).SelectMany(Targets).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var free = old.SelectMany(Targets).Where(t => Paths.IsUnder(blobs, t) && !keep.Contains(t) && File.Exists(t)).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        var parts = old.Select(d => new Part(d, true, Fs.Size(d), Directory.GetLastWriteTimeUtc(d)))
+            .Concat(free.Select(f => new Part(f, false, new FileInfo(f).Length, File.GetLastWriteTimeUtc(f)))).ToList();
+        var stats = old.Select(Fs.Measure).Aggregate(Newer);
+        var (at, source) = Fs.LastUsed(stats);
+        return new Unit
+        {
+            Id = $"{l.Id}|detached|{repo}", Location = l.Id, Category = l.Category, Title = string.Format(Loc.T("Title.HfDetached"), Path.GetFileName(repo), old.Count),
+            Root = hub, Path = snapsDir, Parts = parts, Bytes = parts.Sum(p => p.Bytes), LastUsed = at, Source = source, Owners = l.Owners, Rebuild = "Rebuild.Download",
+        };
+    }
+
+    /// <summary>"*.incomplete" downloads untouched for a day: a download in progress is younger and holds its file open.</summary>
+    internal static Unit? Incomplete(string hub, Location l)
+    {
+        var day = DateTime.UtcNow.AddDays(-1);
+        var files = Directory.EnumerateFiles(hub, "*.incomplete", Fs.Deep).Select(f => new FileInfo(f)).Where(f => f.LastWriteTimeUtc < day).ToList();
+        if (files.Count == 0) return null;
+        return new Unit
+        {
+            Id = $"{l.Id}|incomplete|{hub}", Location = l.Id, Category = l.Category, Title = Loc.T("Title.HfIncomplete"), Root = hub, Path = hub,
+            Parts = files.Select(f => new Part(f.FullName, false, f.Length, f.LastWriteTimeUtc)).ToList(), Bytes = files.Sum(f => f.Length),
+            LastUsed = files.Max(f => f.LastWriteTimeUtc), Source = UsedSource.Modified, Owners = l.Owners, Rebuild = "Rebuild.Nothing",
+        };
     }
 
     static Stats Newer(Stats a, Stats b) => new(a.Bytes, a.Modified > b.Modified ? a.Modified : b.Modified, a.Accessed > b.Accessed ? a.Accessed : b.Accessed);

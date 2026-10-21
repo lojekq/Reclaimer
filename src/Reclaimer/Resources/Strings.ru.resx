@@ -217,4 +217,12 @@
   <data name="Size.TB" xml:space="preserve"><value>{0:0.0} ТБ</value></data>
   <data name="Age.Yesterday" xml:space="preserve"><value>вчера</value></data>
   <data name="Quarantine.LastDay" xml:space="preserve"><value>последний день</value></data>
+  <data name="Title.HfDetached" xml:space="preserve"><value>{0}: старые ревизии ({1})</value></data>
+  <data name="Title.HfIncomplete" xml:space="preserve"><value>Недокачанные файлы Hugging Face</value></data>
+  <data name="Source.Ran" xml:space="preserve"><value>запуск</value></data>
+  <data name="Title.torch-hub" xml:space="preserve"><value>Кэш PyTorch hub</value></data>
+  <data name="Title.gradle" xml:space="preserve"><value>Кэши Gradle</value></data>
+  <data name="Title.maven" xml:space="preserve"><value>Репозиторий Maven</value></data>
+  <data name="Title.go-mod" xml:space="preserve"><value>Кэш модулей Go</value></data>
+  <data name="Title.yarn" xml:space="preserve"><value>Кэш Yarn</value></data>
 </root>

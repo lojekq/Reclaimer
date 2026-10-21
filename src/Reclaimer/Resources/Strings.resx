@@ -217,4 +217,12 @@ Open the folder?</value></data>
   <data name="Size.TB" xml:space="preserve"><value>{0:0.0} TB</value></data>
   <data name="Age.Yesterday" xml:space="preserve"><value>yesterday</value></data>
   <data name="Quarantine.LastDay" xml:space="preserve"><value>last day</value></data>
+  <data name="Title.HfDetached" xml:space="preserve"><value>{0}: {1} old revisions</value></data>
+  <data name="Title.HfIncomplete" xml:space="preserve"><value>Unfinished Hugging Face downloads</value></data>
+  <data name="Source.Ran" xml:space="preserve"><value>ran</value></data>
+  <data name="Title.torch-hub" xml:space="preserve"><value>PyTorch hub cache</value></data>
+  <data name="Title.gradle" xml:space="preserve"><value>Gradle caches</value></data>
+  <data name="Title.maven" xml:space="preserve"><value>Maven repository</value></data>
+  <data name="Title.go-mod" xml:space="preserve"><value>Go module cache</value></data>
+  <data name="Title.yarn" xml:space="preserve"><value>Yarn cache</value></data>
 </root>

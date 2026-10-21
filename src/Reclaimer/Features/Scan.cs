@@ -99,6 +99,8 @@ public static class Scan
             ("OLLAMA_MODELS", @"ollama\models"), ("HF_HUB_CACHE", @"huggingface\hub"), ("HF_XET_CACHE", @"huggingface\xet"),
             ("NUGET_PACKAGES", @"nuget\packages"), ("NUGET_HTTP_CACHE_PATH", @"nuget\v3-cache"), ("npm_config_cache", "npm-cache"),
             ("PIP_CACHE_DIR", @"pip\Cache"), ("UV_CACHE_DIR", @"uv\cache"), ("PNPM_HOME", "pnpm"), ("CARGO_HOME", "cargo"),
+            ("TORCH_HOME", "torch"), ("LLAMA_CACHE", "llama.cpp"), ("GRADLE_USER_HOME", "gradle"), ("GOMODCACHE", @"go\pkg\mod"),
+            ("YARN_CACHE_FOLDER", @"yarn\cache"),
         })
             Environment.SetEnvironmentVariable(v, Path.Combine(s, sub));
 #endif
