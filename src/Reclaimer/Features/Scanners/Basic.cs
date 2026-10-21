@@ -56,7 +56,12 @@ public static class ModelFileScanner
 }
 
 /// <summary>WSL distribution or Docker Desktop disk: report only in the MVP (compacting is v1.0).</summary>
-public sealed record Disk(string Name, string Path, long Bytes, bool Sparse, bool Running);
+public sealed record Disk(string Name, string Path, long Bytes, bool Sparse, bool Running)
+{
+    public string SizeText => Format.Size(Bytes);
+    public string SparseText => Loc.T(Sparse ? "Common.Yes" : "Common.No");
+    public string RunningText => Loc.T(Running ? "Disks.Running" : "Disks.Stopped");
+}
 
 public static class VhdxScanner
 {

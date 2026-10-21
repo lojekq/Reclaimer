@@ -31,8 +31,14 @@
         <ui:NavigationView x:Name="Nav" Grid.Row="2" PaneDisplayMode="Left" IsBackButtonVisible="Collapsed"
                            IsPaneToggleVisible="False" OpenPaneLength="220">
             <ui:NavigationView.MenuItems>
-                <ui:NavigationViewItem Content="{l:T Page.Main}" Icon="{ui:SymbolIcon Home24}"
-                                       TargetPageType="{x:Type f:MainPage}" TargetPageTag="main" />
+                <ui:NavigationViewItem Content="{l:T Page.Overview}" Icon="{ui:SymbolIcon Home24}"
+                                       TargetPageType="{x:Type f:OverviewPage}" TargetPageTag="overview" />
+                <ui:NavigationViewItem Content="{l:T Page.Findings}" Icon="{ui:SymbolIcon Search24}"
+                                       TargetPageType="{x:Type f:FindingsPage}" TargetPageTag="findings" />
+                <ui:NavigationViewItem Content="{l:T Page.Quarantine}" Icon="{ui:SymbolIcon Archive24}"
+                                       TargetPageType="{x:Type f:QuarantinePage}" TargetPageTag="quarantine" />
+                <ui:NavigationViewItem Content="{l:T Page.Disks}" Icon="{ui:SymbolIcon Storage24}"
+                                       TargetPageType="{x:Type f:DisksPage}" TargetPageTag="disks" />
             </ui:NavigationView.MenuItems>
             <ui:NavigationView.FooterMenuItems>
                 <ui:NavigationViewItem Content="{l:T Page.Settings}" Icon="{ui:SymbolIcon Settings24}"
@@ -41,5 +47,14 @@
                                        TargetPageType="{x:Type l:AboutPage}" TargetPageTag="about" />
             </ui:NavigationView.FooterMenuItems>
         </ui:NavigationView>
+
+        <!-- In-window dialogs (Features/Dialog.cs): screenshots and GIFs capture them with the window -->
+        <Border x:Name="DialogHost" Grid.RowSpan="3" Background="#99000000" Visibility="Collapsed">
+            <Border Background="{DynamicResource ApplicationBackgroundBrush}" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                    BorderThickness="1" CornerRadius="8" Padding="24,20" Margin="48" MaxWidth="820"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ContentPresenter x:Name="DialogContent" />
+            </Border>
+        </Border>
     </Grid>
 </ui:FluentWindow>

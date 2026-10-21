@@ -32,7 +32,22 @@ public sealed class Entry
     [JsonIgnore] public string Root => Path.GetDirectoryName(Dir)!;
     [JsonIgnore] public string Original => Parts.Count > 0 ? Parts[^1].Original : "";
 
+    public override string ToString() => Title;
+
     public bool IsExpired(DateTime nowUtc) => State == EntryState.Done && nowUtc >= ExpiresUtc;
+
+    // For the list
+    [JsonIgnore] public string SizeText => Format.Size(TotalBytes);
+    [JsonIgnore] public string WhenText => Format.Ago(CreatedUtc);
+    [JsonIgnore] public bool IsBroken => State == EntryState.Broken;
+    [JsonIgnore] public bool CanAct => State is EntryState.Done or EntryState.Restoring;
+    [JsonIgnore] public string LeftText => State switch
+    {
+        EntryState.Broken => Loc.T("Quarantine.BrokenState"),
+        EntryState.Done or EntryState.Restoring => (int)Math.Ceiling((ExpiresUtc - DateTime.UtcNow).TotalDays) is var d && d > 1
+            ? string.Format(Loc.T("Quarantine.Left"), d) : Loc.T("Quarantine.LastDay"),
+        _ => Loc.T("Quarantine.State." + State),
+    };
 }
 
 /// <summary>

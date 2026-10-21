@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using Reclaimer.Demo;
 using Reclaimer.Features;
@@ -30,6 +31,7 @@ public partial class App : Application
             Shutdown();
             return;
         }
+        Scan.UseSandboxInDebug(); // before anything reads a catalog variable
         Settings.Load();
         Loc.Apply(Settings.Current.Language);
         Log.Info($"start {AppInfo.Version}{(a.Unknown.Count > 0 ? $", {a.Unknown.Count} unknown argument(s)" : "")}");
@@ -37,7 +39,10 @@ public partial class App : Application
         if (a.Demo) DemoData.Fill();
         else if (Install.IsInstalled) InstalledStart(); // Debug builds and exes in Downloads write nothing by themselves
 
-        // App features: services, hotkeys, tray items, settings section
+        // App features: settings section, quarantine hooks, tray items
+        SettingsPage.AppSection = SettingsSection.Create;
+        Exiting += Model.I.Stop;
+        RemoveData = RemoveQuarantine;
 
         window = new MainWindow();
         if (a.Width > 0) (window.Width, window.Height) = (a.Width, a.Height);
@@ -54,7 +59,13 @@ public partial class App : Application
         };
         Capture.Attach(window, () => { if (a.Autoplay) Autoplay.Start(window); });
 
-        if (a.Screenshot is null) Tray.Create(ShowMain, () => Quit());
+        if (a.Screenshot is null)
+        {
+            Tray.Create(ShowMain, () => Quit(), TrayMenu.Items());
+            Model.I.QuarantineChanged += TrayMenu.Update;
+            TrayMenu.Update();
+        }
+        Model.I.Start();
         SessionEnding += (_, _) => RaiseExiting();
         Updates.Found += (version, url) =>
         {
@@ -87,10 +98,27 @@ public partial class App : Application
             StartMenu.FixPath();
             if (Settings.Current.FirstRunDone) return;
             StartMenu.Set(true);
+            Autostart.Set(true); // Reclaimer: the autoclean needs it (07 §2); only for the exe in %LOCALAPPDATA%\Programs\Reclaimer
             Settings.Current.FirstRunDone = true;
             Settings.Save();
         }
         catch (Exception e) { Log.Error("installed start", e); }
+    }
+
+    /// <summary>"Remove data &amp; autostart" would delete the journal with the data: refused until the quarantine is empty (07 §8.12).</summary>
+    static string? RemoveQuarantine()
+    {
+        if (Args.Current.Demo) return string.Format(Loc.T("Remove.NotEmpty"), Model.I.QuarantineText);
+        var entries = Quarantine.List();
+        if (entries.Count > 0) return string.Format(Loc.T("Remove.NotEmpty"), Format.Size(entries.Sum(e => e.TotalBytes)));
+        foreach (var root in Quarantine.KnownRoots().Where(Directory.Exists))
+            try
+            {
+                File.Delete(Path.Combine(root, "README.txt"));
+                Directory.Delete(root); // empty by now; fails harmlessly if not
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException) { }
+        return null;
     }
 
     public static void RaiseExiting()

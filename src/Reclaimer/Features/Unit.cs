@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Reclaimer.Shell;
 
 namespace Reclaimer.Features;
 
@@ -35,13 +36,17 @@ public sealed class Unit : INotifyPropertyChanged
     public bool Approximate { get; init; }              // hardlinks, block cloning: freed space may be smaller
 
     UnitStatus status;
-    public UnitStatus Status { get => status; set { status = value; Changed(); Changed(nameof(CanSelect)); } }
+    public UnitStatus Status
+    {
+        get => status;
+        set { status = value; Changed(); Changed(nameof(CanSelect)); Changed(nameof(StatusText)); if (!CanSelect) Selected = false; }
+    }
 
     string? owner;
-    public string? Owner { get => owner; set { owner = value; Changed(); } } // the running owner, for "Close Ollama"
+    public string? Owner { get => owner; set { owner = value; Changed(); Changed(nameof(StatusText)); } } // the running owner, for "Close Ollama"
 
     bool selected;
-    public bool Selected { get => selected; set { if (value && !CanSelect) return; selected = value; Changed(); } }
+    public bool Selected { get => selected; set { if (value && !CanSelect || value == selected) return; selected = value; Changed(); } }
 
     public bool CanSelect => Status == UnitStatus.Ready;
 
@@ -49,6 +54,17 @@ public sealed class Unit : INotifyPropertyChanged
     public string Path { get => path ?? Parts[^1].Path; init => path = value; } // what people recognise; by default the last part
 
     public int? AgeDays => LastUsed is { } t ? (int)Math.Max(0, (DateTime.UtcNow - t).TotalDays) : null;
+
+    // For the table
+    public string ShortPath => Dialog.Short(Path);
+    public string SizeText => (Approximate ? "≈ " : "") + Format.Size(Bytes);
+    public string UsedText => Format.Ago(LastUsed);
+    public string SourceText => Loc.T("Source." + Source);
+    public string StatusText => Model.Reason("Status." + Status, this);
+    public string RebuildText => Rebuild is null ? "" : Loc.T(Rebuild);
+    public string CategoryText => Loc.T("Category." + Category);
+
+    public override string ToString() => Title; // screen readers and UI Automation name the row by it
 
     public event PropertyChangedEventHandler? PropertyChanged;
     void Changed([CallerMemberName] string? p = null) => PropertyChanged?.Invoke(this, new(p));

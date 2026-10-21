@@ -7,7 +7,6 @@
   <data name="Tray.Open" xml:space="preserve"><value>Open</value></data>
   <data name="Tray.Exit" xml:space="preserve"><value>Exit</value></data>
   <data name="Tray.Hidden" xml:space="preserve"><value>Still running in the notification area. To quit, right-click the icon and choose Exit.</value></data>
-  <data name="Page.Main" xml:space="preserve"><value>Home</value></data>
   <data name="Page.Settings" xml:space="preserve"><value>Settings</value></data>
   <data name="Page.About" xml:space="preserve"><value>About</value></data>
   <data name="Settings.Language" xml:space="preserve"><value>Language</value></data>
@@ -34,7 +33,7 @@
   <data name="Update.Message" xml:space="preserve"><value>Version {0} is available.</value></data>
   <data name="Update.Open" xml:space="preserve"><value>Release page</value></data>
   <data name="Elevated.Title" xml:space="preserve"><value>Running as administrator</value></data>
-  <data name="Elevated.Message" xml:space="preserve"><value>This app does not need administrator rights. Restart it the usual way.</value></data>
+  <data name="Elevated.Message" xml:space="preserve"><value>Run Reclaimer as a normal user: as administrator it may scan another user's profile.</value></data>
   <data name="Crash.Message" xml:space="preserve"><value>{0} has crashed and closed.
 
 Crash log: {1}
@@ -43,13 +42,179 @@ Open the folder?</value></data>
   <data name="Hotkey.Placeholder" xml:space="preserve"><value>Press a key combination</value></data>
   <data name="Hotkey.Busy" xml:space="preserve"><value>Taken by another program</value></data>
   <data name="Hotkey.Failed" xml:space="preserve"><value>Could not register</value></data>
-  <data name="Sample.Hotkey" xml:space="preserve"><value>Hotkey to show the window</value></data>
-  <data name="Main.Title" xml:space="preserve"><value>Tasks</value></data>
-  <data name="Main.Subtitle" xml:space="preserve"><value>Sample page of the template. Replace it with the app's own pages.</value></data>
-  <data name="Main.Empty" xml:space="preserve"><value>Nothing here yet.</value></data>
-  <data name="Demo.Build" xml:space="preserve"><value>Project build</value></data>
-  <data name="Demo.Dataset" xml:space="preserve"><value>Dataset download</value></data>
-  <data name="Demo.Report" xml:space="preserve"><value>Report for Alex</value></data>
-  <data name="Demo.Daily" xml:space="preserve"><value>every day at 6 PM</value></data>
-  <data name="Demo.Backup" xml:space="preserve"><value>Nightly backup</value></data>
+  <data name="Page.Overview" xml:space="preserve"><value>Overview</value></data>
+  <data name="Page.Findings" xml:space="preserve"><value>Findings</value></data>
+  <data name="Page.Quarantine" xml:space="preserve"><value>Quarantine</value></data>
+  <data name="Page.Disks" xml:space="preserve"><value>WSL and Docker</value></data>
+  <data name="Overview.Subtitle" xml:space="preserve"><value>Gigabytes taken by AI models, package caches and stale build folders. Scanning only reads: nothing moves until you confirm.</value></data>
+  <data name="Overview.NoRoots.Title" xml:space="preserve"><value>Where are your projects?</value></data>
+  <data name="Overview.NoRoots.Message" xml:space="preserve"><value>Add the folders with your projects to find node_modules, target, bin/obj and .venv you no longer use.</value></data>
+  <data name="Overview.AddRoots" xml:space="preserve"><value>Add project folders…</value></data>
+  <data name="Overview.CanReturn" xml:space="preserve"><value>Can be reclaimed</value></data>
+  <data name="Overview.Count" xml:space="preserve"><value>{0} items</value></data>
+  <data name="Overview.Report" xml:space="preserve"><value>{0} disks, report only</value></data>
+  <data name="Overview.Volumes" xml:space="preserve"><value>Disks</value></data>
+  <data name="Overview.Volume" xml:space="preserve"><value>{0} free of {1}</value></data>
+  <data name="Overview.VolumeQuarantine" xml:space="preserve"><value>In quarantine {0} (frees up on {1})</value></data>
+  <data name="Overview.LastScan" xml:space="preserve"><value>Last scan: {0}</value></data>
+  <data name="Scan.Button" xml:space="preserve"><value>Scan</value></data>
+  <data name="Scan.Running" xml:space="preserve"><value>Scanning…</value></data>
+  <data name="Scan.Step" xml:space="preserve"><value>Scanning: {0}…</value></data>
+  <data name="Scan.Done" xml:space="preserve"><value>Found {0} items, {1} in all</value></data>
+  <data name="Scan.Cancelled" xml:space="preserve"><value>Scan cancelled</value></data>
+  <data name="Scan.Failed" xml:space="preserve"><value>Scan failed, see the log</value></data>
+  <data name="Category.Models" xml:space="preserve"><value>AI models</value></data>
+  <data name="Category.Caches" xml:space="preserve"><value>Package caches</value></data>
+  <data name="Category.Projects" xml:space="preserve"><value>Projects</value></data>
+  <data name="Category.Disks" xml:space="preserve"><value>WSL and Docker</value></data>
+  <data name="Findings.Older" xml:space="preserve"><value>Older than</value></data>
+  <data name="Findings.Days" xml:space="preserve"><value>days</value></data>
+  <data name="Findings.SizeFrom" xml:space="preserve"><value>Size from</value></data>
+  <data name="Findings.Mb" xml:space="preserve"><value>MB</value></data>
+  <data name="Findings.All" xml:space="preserve"><value>All categories</value></data>
+  <data name="Findings.Recommend" xml:space="preserve"><value>Mark recommended</value></data>
+  <data name="Findings.Recheck" xml:space="preserve"><value>Check again</value></data>
+  <data name="Findings.Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Findings.Size" xml:space="preserve"><value>Size</value></data>
+  <data name="Findings.Used" xml:space="preserve"><value>Last used</value></data>
+  <data name="Findings.Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Findings.Rebuild" xml:space="preserve"><value>How it comes back</value></data>
+  <data name="Findings.Empty" xml:space="preserve"><value>Nothing here yet. Press Scan: it only reads, nothing is moved.</value></data>
+  <data name="Findings.Explorer" xml:space="preserve"><value>Show in Explorer</value></data>
+  <data name="Findings.Selected" xml:space="preserve"><value>Selected: {0} · ≈ {1}</value></data>
+  <data name="Findings.Move" xml:space="preserve"><value>Move to quarantine…</value></data>
+  <data name="Source.Commit" xml:space="preserve"><value>commit</value></data>
+  <data name="Source.Modified" xml:space="preserve"><value>modified</value></data>
+  <data name="Source.Accessed" xml:space="preserve"><value>opened</value></data>
+  <data name="Source.Unknown" xml:space="preserve"><value>unknown</value></data>
+  <data name="Age.Today" xml:space="preserve"><value>today</value></data>
+  <data name="Age.Days" xml:space="preserve"><value>{0} days ago</value></data>
+  <data name="Age.Months" xml:space="preserve"><value>{0} months ago</value></data>
+  <data name="Age.Years" xml:space="preserve"><value>{0} years ago</value></data>
+  <data name="Age.Unknown" xml:space="preserve"><value>unknown</value></data>
+  <data name="Size.GB" xml:space="preserve"><value>{0:0.0} GB</value></data>
+  <data name="Size.MB" xml:space="preserve"><value>{0:0} MB</value></data>
+  <data name="Size.KB" xml:space="preserve"><value>{0} KB</value></data>
+  <data name="Status.Ready" xml:space="preserve"><value>Ready</value></data>
+  <data name="Status.OwnerRunning" xml:space="preserve"><value>Owner running: {0}</value></data>
+  <data name="Status.FilesBusy" xml:space="preserve"><value>Files in use</value></data>
+  <data name="Status.NotIgnored" xml:space="preserve"><value>Not in .gitignore</value></data>
+  <data name="Status.CloudFolder" xml:space="preserve"><value>In a cloud folder</value></data>
+  <data name="Status.NoQuarantine" xml:space="preserve"><value>No quarantine on this volume</value></data>
+  <data name="Status.ReportOnly" xml:space="preserve"><value>Report only</value></data>
+  <data name="Details.Used" xml:space="preserve"><value>Last used {0} ({1})</value></data>
+  <data name="Details.Marker" xml:space="preserve"><value>Marker: {0}</value></data>
+  <data name="Details.CloseOwner" xml:space="preserve"><value>Close {0} and press Check again</value></data>
+  <data name="Details.Why.FilesBusy" xml:space="preserve"><value>Another program holds files here: close it and scan again</value></data>
+  <data name="Details.Why.NotIgnored" xml:space="preserve"><value>git tracks this folder: it may hold your own files</value></data>
+  <data name="Details.Why.CloudFolder" xml:space="preserve"><value>Inside OneDrive or a cloud placeholder: moving it would break the sync</value></data>
+  <data name="Details.Why.NoQuarantine" xml:space="preserve"><value>The quarantine can only be on the same volume, and this one has none</value></data>
+  <data name="Details.Why.ReportOnly" xml:space="preserve"><value>Shown for information, nothing to move</value></data>
+  <data name="Note.HfShared" xml:space="preserve"><value>Shared files {0} stay: other repos use them</value></data>
+  <data name="Note.OllamaShared" xml:space="preserve"><value>Frees {0}; shared layers {1} stay</value></data>
+  <data name="Note.UvSymlink" xml:space="preserve"><value>UV_LINK_MODE=symlink: your venvs link into this cache, moving it would break them</value></data>
+  <data name="Note.Hardlinks" xml:space="preserve"><value>Some files may be hardlinks into projects: less space may be freed</value></data>
+  <data name="Note.CargoCleans" xml:space="preserve"><value>Cargo 1.88+ cleans files older than 3 months by itself</value></data>
+  <data name="Note.CustomCache" xml:space="preserve"><value>Your folder, moved as a whole</value></data>
+  <data name="Note.NoGit" xml:space="preserve"><value>No git: age by file dates</value></data>
+  <data name="Note.GitFailed" xml:space="preserve"><value>git did not answer: age by file dates</value></data>
+  <data name="Note.GitIgnored" xml:space="preserve"><value>git: ignored</value></data>
+  <data name="Title.OllamaOrphans" xml:space="preserve"><value>Ollama blobs without a manifest</value></data>
+  <data name="Title.hf-xet" xml:space="preserve"><value>Hugging Face xet cache</value></data>
+  <data name="Title.pip" xml:space="preserve"><value>pip cache</value></data>
+  <data name="Title.uv" xml:space="preserve"><value>uv cache</value></data>
+  <data name="Title.npm" xml:space="preserve"><value>npm cache</value></data>
+  <data name="Title.pnpm" xml:space="preserve"><value>pnpm store</value></data>
+  <data name="Title.nuget" xml:space="preserve"><value>NuGet packages</value></data>
+  <data name="Title.nuget-http" xml:space="preserve"><value>NuGet HTTP cache</value></data>
+  <data name="Title.cargo-cache" xml:space="preserve"><value>Cargo registry cache</value></data>
+  <data name="Title.cargo-src" xml:space="preserve"><value>Cargo registry sources</value></data>
+  <data name="Title.custom" xml:space="preserve"><value>Own cache folder</value></data>
+  <data name="Rebuild.Download" xml:space="preserve"><value>Downloaded again</value></data>
+  <data name="Rebuild.OllamaPull" xml:space="preserve"><value>ollama pull</value></data>
+  <data name="Rebuild.Cache" xml:space="preserve"><value>Refilled on the next install</value></data>
+  <data name="Rebuild.Restore" xml:space="preserve"><value>Refilled by dotnet restore</value></data>
+  <data name="Rebuild.Npm" xml:space="preserve"><value>npm install</value></data>
+  <data name="Rebuild.Cargo" xml:space="preserve"><value>cargo build</value></data>
+  <data name="Rebuild.Dotnet" xml:space="preserve"><value>dotnet build</value></data>
+  <data name="Rebuild.Venv" xml:space="preserve"><value>Recreate the venv</value></data>
+  <data name="Rebuild.Next" xml:space="preserve"><value>next build</value></data>
+  <data name="Rebuild.Nothing" xml:space="preserve"><value>Not needed</value></data>
+  <data name="Confirm.Title" xml:space="preserve"><value>Move {0} items to the quarantine?</value></data>
+  <data name="Confirm.Parts" xml:space="preserve"><value>({0} parts)</value></data>
+  <data name="Confirm.Copy" xml:space="preserve"><value>Copy list (Markdown)</value></data>
+  <data name="Confirm.Total" xml:space="preserve"><value>Total ≈ {0}. Kept for {1} days, until {2}: until then one click brings it back.</value></data>
+  <data name="Confirm.Where" xml:space="preserve"><value>Quarantine on {0} is {1}</value></data>
+  <data name="Confirm.WarnModels" xml:space="preserve"><value>Models will have to be downloaded again after the quarantine is cleaned: {0}.</value></data>
+  <data name="Confirm.WarnSpace" xml:space="preserve"><value>Space is freed only when the quarantine is cleaned: on {0}, or now on the Quarantine page.</value></data>
+  <data name="Confirm.Move" xml:space="preserve"><value>Move {0} items (≈ {1})</value></data>
+  <data name="Move.Skipped" xml:space="preserve"><value>Some items were skipped</value></data>
+  <data name="Move.NotReady" xml:space="preserve"><value>not ready</value></data>
+  <data name="Move.Changed" xml:space="preserve"><value>changed since the scan, scan again</value></data>
+  <data name="Move.SizeChanged" xml:space="preserve"><value>size changed by more than 10% since the scan</value></data>
+  <data name="Move.OutsideSandbox" xml:space="preserve"><value>Debug build: only the sandbox is allowed</value></data>
+  <data name="Move.JournalFailed" xml:space="preserve"><value>could not write the journal (disk full?): nothing moved</value></data>
+  <data name="Move.Cfa" xml:space="preserve"><value>Controlled folder access blocked it. Allow Reclaimer in Windows Security → Ransomware protection → Allow an app through Controlled folder access</value></data>
+  <data name="Move.Failed" xml:space="preserve"><value>could not be moved, see the log</value></data>
+  <data name="Guard.Missing" xml:space="preserve"><value>no longer exists</value></data>
+  <data name="Guard.Link" xml:space="preserve"><value>is a link: moving it would not free space</value></data>
+  <data name="Guard.Unresolvable" xml:space="preserve"><value>a link on the path could not be resolved</value></data>
+  <data name="Guard.OutsideRoot" xml:space="preserve"><value>outside the known locations</value></data>
+  <data name="Guard.TooShort" xml:space="preserve"><value>path too short to be safe</value></data>
+  <data name="Guard.StopList" xml:space="preserve"><value>a system or user folder</value></data>
+  <data name="Guard.Quarantine" xml:space="preserve"><value>inside the quarantine</value></data>
+  <data name="Guard.Excluded" xml:space="preserve"><value>in an excluded folder</value></data>
+  <data name="Guard.Git" xml:space="preserve"><value>has its own .git</value></data>
+  <data name="Quarantine.Summary" xml:space="preserve"><value>{0} items, {1}. Each waits {2} days, then it is deleted.</value></data>
+  <data name="Quarantine.Empty" xml:space="preserve"><value>The quarantine is empty. Moved items wait here before they are deleted.</value></data>
+  <data name="Quarantine.CleanAll" xml:space="preserve"><value>Clean all now…</value></data>
+  <data name="Quarantine.Restore" xml:space="preserve"><value>Restore</value></data>
+  <data name="Quarantine.Delete" xml:space="preserve"><value>Delete now</value></data>
+  <data name="Quarantine.Left" xml:space="preserve"><value>{0} days left</value></data>
+  <data name="Quarantine.BrokenState" xml:space="preserve"><value>Broken: check by hand</value></data>
+  <data name="Quarantine.Broken" xml:space="preserve"><value>The entry is damaged or its folder was replaced: nothing was touched</value></data>
+  <data name="Quarantine.State.Moving" xml:space="preserve"><value>Moving…</value></data>
+  <data name="Quarantine.State.Purging" xml:space="preserve"><value>Deleting…</value></data>
+  <data name="Restore.Conflict" xml:space="preserve"><value>the original path is taken again</value></data>
+  <data name="Restore.ConflictTitle" xml:space="preserve"><value>The original path is taken</value></data>
+  <data name="Restore.ConflictText" xml:space="preserve"><value>{0} exists again (the tool made a new one). Nothing will be overwritten.</value></data>
+  <data name="Restore.Beside" xml:space="preserve"><value>Restore beside as {0}</value></data>
+  <data name="Restore.Failed" xml:space="preserve"><value>Could not restore</value></data>
+  <data name="Delete.Title" xml:space="preserve"><value>Delete for good?</value></data>
+  <data name="Delete.Text" xml:space="preserve"><value>{0}, {1}. There is no undo.</value></data>
+  <data name="CleanAll.Title" xml:space="preserve"><value>Clean the whole quarantine?</value></data>
+  <data name="CleanAll.Text" xml:space="preserve"><value>{0} items, {1}. There is no undo.</value></data>
+  <data name="Purge.Failed" xml:space="preserve"><value>Could not delete</value></data>
+  <data name="Notify.Freed" xml:space="preserve"><value>Freed {0}</value></data>
+  <data name="Tray.Scan" xml:space="preserve"><value>Scan</value></data>
+  <data name="Tray.Quarantine" xml:space="preserve"><value>Quarantine ({0})</value></data>
+  <data name="Tray.Clean" xml:space="preserve"><value>Clean quarantine now…</value></data>
+  <data name="Tray.Tooltip" xml:space="preserve"><value>{0}: {1} in quarantine</value></data>
+  <data name="Remove.NotEmpty" xml:space="preserve"><value>Restore or clean the quarantine first ({0}): its journal would be deleted with the data.</value></data>
+  <data name="Disks.Subtitle" xml:space="preserve"><value>WSL distributions and the Docker Desktop disk. Report only: these files only grow, compacting them comes in v1.0.</value></data>
+  <data name="Disks.Empty" xml:space="preserve"><value>No WSL or Docker disks found yet. Run a scan.</value></data>
+  <data name="Disks.Sparse" xml:space="preserve"><value>Sparse</value></data>
+  <data name="Disks.Running" xml:space="preserve"><value>Running</value></data>
+  <data name="Disks.Stopped" xml:space="preserve"><value>Stopped</value></data>
+  <data name="Common.Yes" xml:space="preserve"><value>Yes</value></data>
+  <data name="Common.No" xml:space="preserve"><value>No</value></data>
+  <data name="Common.Ok" xml:space="preserve"><value>OK</value></data>
+  <data name="Common.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Settings.Add" xml:space="preserve"><value>Add…</value></data>
+  <data name="Settings.Remove" xml:space="preserve"><value>Remove</value></data>
+  <data name="Settings.Folders" xml:space="preserve"><value>{0} folders</value></data>
+  <data name="Settings.ProjectRoots" xml:space="preserve"><value>Project folders</value></data>
+  <data name="Settings.ProjectRoots.Note" xml:space="preserve"><value>searched for build folders, up to 6 levels deep</value></data>
+  <data name="Settings.AgeDays" xml:space="preserve"><value>Abandoned after, days</value></data>
+  <data name="Settings.QuarantineDays" xml:space="preserve"><value>Keep in quarantine, days (1–30)</value></data>
+  <data name="Settings.MinSize" xml:space="preserve"><value>Minimum size, MB</value></data>
+  <data name="Settings.ModelDirs" xml:space="preserve"><value>Model folders</value></data>
+  <data name="Settings.ModelDirs.Note" xml:space="preserve"><value>ComfyUI models, GGUF folders: files of 100 MB and more</value></data>
+  <data name="Settings.ExtraCaches" xml:space="preserve"><value>Own cache folders</value></data>
+  <data name="Settings.ExtraCaches.Note" xml:space="preserve"><value>moved as a whole: only add folders a tool refills by itself</value></data>
+  <data name="Settings.Excluded" xml:space="preserve"><value>Excluded folders</value></data>
+  <data name="Settings.Excluded.Note" xml:space="preserve"><value>never scanned or moved</value></data>
+  <data name="Size.TB" xml:space="preserve"><value>{0:0.0} TB</value></data>
+  <data name="Age.Yesterday" xml:space="preserve"><value>yesterday</value></data>
+  <data name="Quarantine.LastDay" xml:space="preserve"><value>last day</value></data>
 </root>

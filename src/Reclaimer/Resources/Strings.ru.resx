@@ -7,7 +7,6 @@
   <data name="Tray.Open" xml:space="preserve"><value>Открыть</value></data>
   <data name="Tray.Exit" xml:space="preserve"><value>Выход</value></data>
   <data name="Tray.Hidden" xml:space="preserve"><value>Программа продолжает работать в области уведомлений. Чтобы выйти, щёлкните значок правой кнопкой и выберите «Выход».</value></data>
-  <data name="Page.Main" xml:space="preserve"><value>Главная</value></data>
   <data name="Page.Settings" xml:space="preserve"><value>Настройки</value></data>
   <data name="Page.About" xml:space="preserve"><value>О программе</value></data>
   <data name="Settings.Language" xml:space="preserve"><value>Язык</value></data>
@@ -34,7 +33,7 @@
   <data name="Update.Message" xml:space="preserve"><value>Доступна версия {0}.</value></data>
   <data name="Update.Open" xml:space="preserve"><value>Страница релиза</value></data>
   <data name="Elevated.Title" xml:space="preserve"><value>Запущено от администратора</value></data>
-  <data name="Elevated.Message" xml:space="preserve"><value>Программе не нужны права администратора. Перезапустите её обычным способом.</value></data>
+  <data name="Elevated.Message" xml:space="preserve"><value>Запусти Reclaimer обычным пользователем: от администратора он может просканировать чужой профиль.</value></data>
   <data name="Crash.Message" xml:space="preserve"><value>{0} аварийно завершилась.
 
 Лог ошибки: {1}
@@ -43,13 +42,179 @@
   <data name="Hotkey.Placeholder" xml:space="preserve"><value>Нажмите сочетание клавиш</value></data>
   <data name="Hotkey.Busy" xml:space="preserve"><value>Занято другой программой</value></data>
   <data name="Hotkey.Failed" xml:space="preserve"><value>Не удалось зарегистрировать</value></data>
-  <data name="Sample.Hotkey" xml:space="preserve"><value>Сочетание клавиш для окна</value></data>
-  <data name="Main.Title" xml:space="preserve"><value>Задачи</value></data>
-  <data name="Main.Subtitle" xml:space="preserve"><value>Пример страницы шаблона. Замените её страницами программы.</value></data>
-  <data name="Main.Empty" xml:space="preserve"><value>Пока пусто.</value></data>
-  <data name="Demo.Build" xml:space="preserve"><value>Сборка проекта</value></data>
-  <data name="Demo.Dataset" xml:space="preserve"><value>Загрузка датасета</value></data>
-  <data name="Demo.Report" xml:space="preserve"><value>Отчёт для Alex</value></data>
-  <data name="Demo.Daily" xml:space="preserve"><value>каждый день в 18:00</value></data>
-  <data name="Demo.Backup" xml:space="preserve"><value>Ночная копия</value></data>
+  <data name="Page.Overview" xml:space="preserve"><value>Обзор</value></data>
+  <data name="Page.Findings" xml:space="preserve"><value>Находки</value></data>
+  <data name="Page.Quarantine" xml:space="preserve"><value>Отстойник</value></data>
+  <data name="Page.Disks" xml:space="preserve"><value>WSL и Docker</value></data>
+  <data name="Overview.Subtitle" xml:space="preserve"><value>Гигабайты, которые заняли модели ИИ, кэши пакетов и старые папки сборки. Сканирование только читает: без подтверждения ничего не двигается.</value></data>
+  <data name="Overview.NoRoots.Title" xml:space="preserve"><value>Где лежат проекты?</value></data>
+  <data name="Overview.NoRoots.Message" xml:space="preserve"><value>Добавь папки с проектами, чтобы найти ненужные node_modules, target, bin/obj и .venv.</value></data>
+  <data name="Overview.AddRoots" xml:space="preserve"><value>Добавить папки проектов…</value></data>
+  <data name="Overview.CanReturn" xml:space="preserve"><value>Можно вернуть</value></data>
+  <data name="Overview.Count" xml:space="preserve"><value>объектов: {0}</value></data>
+  <data name="Overview.Report" xml:space="preserve"><value>дисков: {0}, только отчёт</value></data>
+  <data name="Overview.Volumes" xml:space="preserve"><value>Диски</value></data>
+  <data name="Overview.Volume" xml:space="preserve"><value>свободно {0} из {1}</value></data>
+  <data name="Overview.VolumeQuarantine" xml:space="preserve"><value>В отстойнике {0} (освободится {1})</value></data>
+  <data name="Overview.LastScan" xml:space="preserve"><value>Последний скан: {0}</value></data>
+  <data name="Scan.Button" xml:space="preserve"><value>Сканировать</value></data>
+  <data name="Scan.Running" xml:space="preserve"><value>Сканирование…</value></data>
+  <data name="Scan.Step" xml:space="preserve"><value>Сканирую: {0}…</value></data>
+  <data name="Scan.Done" xml:space="preserve"><value>Найдено объектов: {0}, всего {1}</value></data>
+  <data name="Scan.Cancelled" xml:space="preserve"><value>Сканирование отменено</value></data>
+  <data name="Scan.Failed" xml:space="preserve"><value>Сканирование не удалось, подробности в логе</value></data>
+  <data name="Category.Models" xml:space="preserve"><value>Модели ИИ</value></data>
+  <data name="Category.Caches" xml:space="preserve"><value>Кэши пакетов</value></data>
+  <data name="Category.Projects" xml:space="preserve"><value>Проекты</value></data>
+  <data name="Category.Disks" xml:space="preserve"><value>WSL и Docker</value></data>
+  <data name="Findings.Older" xml:space="preserve"><value>Старше</value></data>
+  <data name="Findings.Days" xml:space="preserve"><value>дн.</value></data>
+  <data name="Findings.SizeFrom" xml:space="preserve"><value>Размер от</value></data>
+  <data name="Findings.Mb" xml:space="preserve"><value>МБ</value></data>
+  <data name="Findings.All" xml:space="preserve"><value>Все категории</value></data>
+  <data name="Findings.Recommend" xml:space="preserve"><value>Отметить рекомендуемое</value></data>
+  <data name="Findings.Recheck" xml:space="preserve"><value>Проверить снова</value></data>
+  <data name="Findings.Name" xml:space="preserve"><value>Название</value></data>
+  <data name="Findings.Size" xml:space="preserve"><value>Размер</value></data>
+  <data name="Findings.Used" xml:space="preserve"><value>Давность</value></data>
+  <data name="Findings.Status" xml:space="preserve"><value>Статус</value></data>
+  <data name="Findings.Rebuild" xml:space="preserve"><value>Как вернётся</value></data>
+  <data name="Findings.Empty" xml:space="preserve"><value>Пока пусто. Нажми «Сканировать»: оно только читает, ничего не двигает.</value></data>
+  <data name="Findings.Explorer" xml:space="preserve"><value>Показать в проводнике</value></data>
+  <data name="Findings.Selected" xml:space="preserve"><value>Выбрано: {0} · ≈ {1}</value></data>
+  <data name="Findings.Move" xml:space="preserve"><value>Переместить в отстойник…</value></data>
+  <data name="Source.Commit" xml:space="preserve"><value>коммит</value></data>
+  <data name="Source.Modified" xml:space="preserve"><value>изменён</value></data>
+  <data name="Source.Accessed" xml:space="preserve"><value>открыт</value></data>
+  <data name="Source.Unknown" xml:space="preserve"><value>неизвестно</value></data>
+  <data name="Age.Today" xml:space="preserve"><value>сегодня</value></data>
+  <data name="Age.Days" xml:space="preserve"><value>{0} дн. назад</value></data>
+  <data name="Age.Months" xml:space="preserve"><value>{0} мес. назад</value></data>
+  <data name="Age.Years" xml:space="preserve"><value>{0} г. назад</value></data>
+  <data name="Age.Unknown" xml:space="preserve"><value>неизвестно</value></data>
+  <data name="Size.GB" xml:space="preserve"><value>{0:0.0} ГБ</value></data>
+  <data name="Size.MB" xml:space="preserve"><value>{0:0} МБ</value></data>
+  <data name="Size.KB" xml:space="preserve"><value>{0} КБ</value></data>
+  <data name="Status.Ready" xml:space="preserve"><value>Готово</value></data>
+  <data name="Status.OwnerRunning" xml:space="preserve"><value>Запущен владелец: {0}</value></data>
+  <data name="Status.FilesBusy" xml:space="preserve"><value>Файлы заняты</value></data>
+  <data name="Status.NotIgnored" xml:space="preserve"><value>Не в .gitignore</value></data>
+  <data name="Status.CloudFolder" xml:space="preserve"><value>В облачной папке</value></data>
+  <data name="Status.NoQuarantine" xml:space="preserve"><value>Нет отстойника на томе</value></data>
+  <data name="Status.ReportOnly" xml:space="preserve"><value>Только отчёт</value></data>
+  <data name="Details.Used" xml:space="preserve"><value>Последнее использование {0} ({1})</value></data>
+  <data name="Details.Marker" xml:space="preserve"><value>Маркер: {0}</value></data>
+  <data name="Details.CloseOwner" xml:space="preserve"><value>Закрой {0} и нажми «Проверить снова»</value></data>
+  <data name="Details.Why.FilesBusy" xml:space="preserve"><value>Файлы держит другая программа: закрой её и просканируй снова</value></data>
+  <data name="Details.Why.NotIgnored" xml:space="preserve"><value>Папку отслеживает git: в ней могут быть твои файлы</value></data>
+  <data name="Details.Why.CloudFolder" xml:space="preserve"><value>Внутри OneDrive или облачная заглушка: перенос сломал бы синхронизацию</value></data>
+  <data name="Details.Why.NoQuarantine" xml:space="preserve"><value>Отстойник бывает только на том же томе, а на этом его нет</value></data>
+  <data name="Details.Why.ReportOnly" xml:space="preserve"><value>Только для сведения, перемещать нечего</value></data>
+  <data name="Note.HfShared" xml:space="preserve"><value>Общие файлы {0} остаются: ими пользуются другие репозитории</value></data>
+  <data name="Note.OllamaShared" xml:space="preserve"><value>Освободит {0}, общие слои {1} остаются</value></data>
+  <data name="Note.UvSymlink" xml:space="preserve"><value>UV_LINK_MODE=symlink: venv ссылаются на этот кэш, перенос их сломает</value></data>
+  <data name="Note.Hardlinks" xml:space="preserve"><value>Часть файлов может быть хардлинками в проекты: освободится меньше</value></data>
+  <data name="Note.CargoCleans" xml:space="preserve"><value>Cargo 1.88+ сам чистит файлы старше 3 месяцев</value></data>
+  <data name="Note.CustomCache" xml:space="preserve"><value>Твоя папка, переносится целиком</value></data>
+  <data name="Note.NoGit" xml:space="preserve"><value>Нет git: возраст по датам файлов</value></data>
+  <data name="Note.GitFailed" xml:space="preserve"><value>git не ответил: возраст по датам файлов</value></data>
+  <data name="Note.GitIgnored" xml:space="preserve"><value>git: игнорируется</value></data>
+  <data name="Title.OllamaOrphans" xml:space="preserve"><value>Блобы Ollama без манифеста</value></data>
+  <data name="Title.hf-xet" xml:space="preserve"><value>Кэш Hugging Face xet</value></data>
+  <data name="Title.pip" xml:space="preserve"><value>Кэш pip</value></data>
+  <data name="Title.uv" xml:space="preserve"><value>Кэш uv</value></data>
+  <data name="Title.npm" xml:space="preserve"><value>Кэш npm</value></data>
+  <data name="Title.pnpm" xml:space="preserve"><value>Хранилище pnpm</value></data>
+  <data name="Title.nuget" xml:space="preserve"><value>Пакеты NuGet</value></data>
+  <data name="Title.nuget-http" xml:space="preserve"><value>HTTP-кэш NuGet</value></data>
+  <data name="Title.cargo-cache" xml:space="preserve"><value>Кэш реестра Cargo</value></data>
+  <data name="Title.cargo-src" xml:space="preserve"><value>Исходники реестра Cargo</value></data>
+  <data name="Title.custom" xml:space="preserve"><value>Своя папка кэша</value></data>
+  <data name="Rebuild.Download" xml:space="preserve"><value>Скачать заново</value></data>
+  <data name="Rebuild.OllamaPull" xml:space="preserve"><value>ollama pull</value></data>
+  <data name="Rebuild.Cache" xml:space="preserve"><value>Наполнится при следующей установке</value></data>
+  <data name="Rebuild.Restore" xml:space="preserve"><value>Наполнит dotnet restore</value></data>
+  <data name="Rebuild.Npm" xml:space="preserve"><value>npm install</value></data>
+  <data name="Rebuild.Cargo" xml:space="preserve"><value>cargo build</value></data>
+  <data name="Rebuild.Dotnet" xml:space="preserve"><value>dotnet build</value></data>
+  <data name="Rebuild.Venv" xml:space="preserve"><value>Создать venv заново</value></data>
+  <data name="Rebuild.Next" xml:space="preserve"><value>next build</value></data>
+  <data name="Rebuild.Nothing" xml:space="preserve"><value>Не нужно</value></data>
+  <data name="Confirm.Title" xml:space="preserve"><value>Переместить в отстойник ({0} шт.)?</value></data>
+  <data name="Confirm.Parts" xml:space="preserve"><value>(частей: {0})</value></data>
+  <data name="Confirm.Copy" xml:space="preserve"><value>Скопировать список (Markdown)</value></data>
+  <data name="Confirm.Total" xml:space="preserve"><value>Итого ≈ {0}. Хранится {1} дн., до {2}: до тех пор возвращается одной кнопкой.</value></data>
+  <data name="Confirm.Where" xml:space="preserve"><value>Отстойник для {0} — {1}</value></data>
+  <data name="Confirm.WarnModels" xml:space="preserve"><value>Модели придётся скачать заново после очистки отстойника: {0}.</value></data>
+  <data name="Confirm.WarnSpace" xml:space="preserve"><value>Место освободится только после очистки отстойника: {0} или сейчас на странице «Отстойник».</value></data>
+  <data name="Confirm.Move" xml:space="preserve"><value>Переместить {0} шт. (≈ {1})</value></data>
+  <data name="Move.Skipped" xml:space="preserve"><value>Часть пропущена</value></data>
+  <data name="Move.NotReady" xml:space="preserve"><value>не готово</value></data>
+  <data name="Move.Changed" xml:space="preserve"><value>изменилось после сканирования, просканируй снова</value></data>
+  <data name="Move.SizeChanged" xml:space="preserve"><value>размер изменился больше чем на 10% после сканирования</value></data>
+  <data name="Move.OutsideSandbox" xml:space="preserve"><value>Debug-сборка: можно только в песочнице</value></data>
+  <data name="Move.JournalFailed" xml:space="preserve"><value>не удалось записать журнал (диск заполнен?): ничего не перемещено</value></data>
+  <data name="Move.Cfa" xml:space="preserve"><value>Заблокировал контролируемый доступ к папкам. Разреши Reclaimer: Безопасность Windows → Защита от программ-шантажистов → Разрешить работу приложения через контролируемый доступ к папкам</value></data>
+  <data name="Move.Failed" xml:space="preserve"><value>не удалось переместить, подробности в логе</value></data>
+  <data name="Guard.Missing" xml:space="preserve"><value>уже не существует</value></data>
+  <data name="Guard.Link" xml:space="preserve"><value>это ссылка: перенос не освободит место</value></data>
+  <data name="Guard.Unresolvable" xml:space="preserve"><value>ссылку на пути не удалось разрешить</value></data>
+  <data name="Guard.OutsideRoot" xml:space="preserve"><value>вне известных мест</value></data>
+  <data name="Guard.TooShort" xml:space="preserve"><value>слишком короткий путь</value></data>
+  <data name="Guard.StopList" xml:space="preserve"><value>системная или пользовательская папка</value></data>
+  <data name="Guard.Quarantine" xml:space="preserve"><value>внутри отстойника</value></data>
+  <data name="Guard.Excluded" xml:space="preserve"><value>в исключённой папке</value></data>
+  <data name="Guard.Git" xml:space="preserve"><value>содержит свой .git</value></data>
+  <data name="Quarantine.Summary" xml:space="preserve"><value>Объектов: {0}, {1}. Каждый ждёт {2} дн., потом удаляется.</value></data>
+  <data name="Quarantine.Empty" xml:space="preserve"><value>Отстойник пуст. Перемещённое ждёт здесь, прежде чем удалиться.</value></data>
+  <data name="Quarantine.CleanAll" xml:space="preserve"><value>Очистить всё сейчас…</value></data>
+  <data name="Quarantine.Restore" xml:space="preserve"><value>Вернуть</value></data>
+  <data name="Quarantine.Delete" xml:space="preserve"><value>Удалить сейчас</value></data>
+  <data name="Quarantine.Left" xml:space="preserve"><value>осталось {0} дн.</value></data>
+  <data name="Quarantine.BrokenState" xml:space="preserve"><value>Повреждено: проверь вручную</value></data>
+  <data name="Quarantine.Broken" xml:space="preserve"><value>Запись повреждена или её папку подменили: ничего не тронуто</value></data>
+  <data name="Quarantine.State.Moving" xml:space="preserve"><value>Перемещается…</value></data>
+  <data name="Quarantine.State.Purging" xml:space="preserve"><value>Удаляется…</value></data>
+  <data name="Restore.Conflict" xml:space="preserve"><value>исходный путь снова занят</value></data>
+  <data name="Restore.ConflictTitle" xml:space="preserve"><value>Исходный путь занят</value></data>
+  <data name="Restore.ConflictText" xml:space="preserve"><value>{0} снова существует (программа создала новую). Ничего не будет перезаписано.</value></data>
+  <data name="Restore.Beside" xml:space="preserve"><value>Вернуть рядом как {0}</value></data>
+  <data name="Restore.Failed" xml:space="preserve"><value>Не удалось вернуть</value></data>
+  <data name="Delete.Title" xml:space="preserve"><value>Удалить без возврата?</value></data>
+  <data name="Delete.Text" xml:space="preserve"><value>{0}, {1}. Вернуть будет нельзя.</value></data>
+  <data name="CleanAll.Title" xml:space="preserve"><value>Очистить весь отстойник?</value></data>
+  <data name="CleanAll.Text" xml:space="preserve"><value>Объектов: {0}, {1}. Вернуть будет нельзя.</value></data>
+  <data name="Purge.Failed" xml:space="preserve"><value>Не удалось удалить</value></data>
+  <data name="Notify.Freed" xml:space="preserve"><value>Освобождено {0}</value></data>
+  <data name="Tray.Scan" xml:space="preserve"><value>Сканировать</value></data>
+  <data name="Tray.Quarantine" xml:space="preserve"><value>Отстойник ({0})</value></data>
+  <data name="Tray.Clean" xml:space="preserve"><value>Очистить отстойник сейчас…</value></data>
+  <data name="Tray.Tooltip" xml:space="preserve"><value>{0}: в отстойнике {1}</value></data>
+  <data name="Remove.NotEmpty" xml:space="preserve"><value>Сначала верни или очисти отстойник ({0}): иначе журнал удалится вместе с данными.</value></data>
+  <data name="Disks.Subtitle" xml:space="preserve"><value>Дистрибутивы WSL и диск Docker Desktop. Только отчёт: эти файлы только растут, сжатие появится в v1.0.</value></data>
+  <data name="Disks.Empty" xml:space="preserve"><value>Дисков WSL и Docker пока не найдено. Запусти сканирование.</value></data>
+  <data name="Disks.Sparse" xml:space="preserve"><value>Разреженный</value></data>
+  <data name="Disks.Running" xml:space="preserve"><value>Запущен</value></data>
+  <data name="Disks.Stopped" xml:space="preserve"><value>Остановлен</value></data>
+  <data name="Common.Yes" xml:space="preserve"><value>Да</value></data>
+  <data name="Common.No" xml:space="preserve"><value>Нет</value></data>
+  <data name="Common.Ok" xml:space="preserve"><value>OK</value></data>
+  <data name="Common.Cancel" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Settings.Add" xml:space="preserve"><value>Добавить…</value></data>
+  <data name="Settings.Remove" xml:space="preserve"><value>Убрать</value></data>
+  <data name="Settings.Folders" xml:space="preserve"><value>папок: {0}</value></data>
+  <data name="Settings.ProjectRoots" xml:space="preserve"><value>Папки проектов</value></data>
+  <data name="Settings.ProjectRoots.Note" xml:space="preserve"><value>в них ищутся папки сборки, до 6 уровней вглубь</value></data>
+  <data name="Settings.AgeDays" xml:space="preserve"><value>Заброшено через, дней</value></data>
+  <data name="Settings.QuarantineDays" xml:space="preserve"><value>Хранить в отстойнике, дней (1–30)</value></data>
+  <data name="Settings.MinSize" xml:space="preserve"><value>Минимальный размер, МБ</value></data>
+  <data name="Settings.ModelDirs" xml:space="preserve"><value>Папки моделей</value></data>
+  <data name="Settings.ModelDirs.Note" xml:space="preserve"><value>models ComfyUI, папки GGUF: файлы от 100 МБ</value></data>
+  <data name="Settings.ExtraCaches" xml:space="preserve"><value>Свои папки кэша</value></data>
+  <data name="Settings.ExtraCaches.Note" xml:space="preserve"><value>переносятся целиком: добавляй только то, что программа наполнит сама</value></data>
+  <data name="Settings.Excluded" xml:space="preserve"><value>Исключённые папки</value></data>
+  <data name="Settings.Excluded.Note" xml:space="preserve"><value>никогда не сканируются и не перемещаются</value></data>
+  <data name="Size.TB" xml:space="preserve"><value>{0:0.0} ТБ</value></data>
+  <data name="Age.Yesterday" xml:space="preserve"><value>вчера</value></data>
+  <data name="Quarantine.LastDay" xml:space="preserve"><value>последний день</value></data>
 </root>

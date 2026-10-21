@@ -1,0 +1,62 @@
+<Page x:Class="Reclaimer.Features.QuarantinePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:l="clr-namespace:Reclaimer.Shell"
+      xmlns:f="clr-namespace:Reclaimer.Features"
+      Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+    <Grid Margin="24,12,24,16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid>
+            <ui:TextBlock FontTypography="Title" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{l:T Page.Quarantine}" />
+            <ui:Button x:Name="CleanButton" HorizontalAlignment="Right" VerticalAlignment="Center" Content="{l:T Quarantine.CleanAll}"
+                       Icon="{ui:SymbolIcon Broom24}" IsEnabled="{Binding Idle}" />
+        </Grid>
+        <ui:TextBlock x:Name="Summary" Grid.Row="1" Appearance="Secondary" TextWrapping="Wrap" Margin="0,4,0,12" />
+
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Entries}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type f:Entry}">
+                        <ui:Card x:Name="C" Margin="0,0,0,6" Padding="16,10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="110" />
+                                    <ColumnDefinition Width="130" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" ToolTip="{Binding Original}">
+                                    <ui:TextBlock Text="{Binding Title}" FontTypography="BodyStrong" TextTrimming="CharacterEllipsis" />
+                                    <ui:TextBlock Text="{Binding Original}" FontTypography="Caption" Appearance="Tertiary" TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <ui:TextBlock Text="{Binding SizeText}" FontTypography="BodyStrong" />
+                                    <ui:TextBlock Text="{Binding WhenText}" FontTypography="Caption" Appearance="Tertiary" />
+                                </StackPanel>
+                                <ui:TextBlock x:Name="Left" Grid.Column="2" Text="{Binding LeftText}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <ui:Button Content="{l:T Quarantine.Restore}" Icon="{ui:SymbolIcon ArrowUndo24}" Click="Restore_Click"
+                                               IsEnabled="{Binding CanAct}" Margin="0,0,8,0" />
+                                    <ui:Button Content="{l:T Quarantine.Delete}" Icon="{ui:SymbolIcon Delete24}" Click="Delete_Click" />
+                                </StackPanel>
+                            </Grid>
+                        </ui:Card>
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding IsBroken}" Value="True">
+                                <Setter TargetName="C" Property="BorderBrush" Value="{DynamicResource SystemFillColorCriticalBrush}" />
+                                <Setter TargetName="C" Property="BorderThickness" Value="2" />
+                                <Setter TargetName="Left" Property="Foreground" Value="{DynamicResource SystemFillColorCriticalBrush}" />
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        <ui:TextBlock x:Name="EmptyText" Grid.Row="2" Text="{l:T Quarantine.Empty}" Appearance="Tertiary" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" />
+    </Grid>
+</Page>

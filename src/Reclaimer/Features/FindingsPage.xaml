@@ -1,0 +1,129 @@
+<Page x:Class="Reclaimer.Features.FindingsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:l="clr-namespace:Reclaimer.Shell"
+      xmlns:f="clr-namespace:Reclaimer.Features"
+      Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+    <Grid Margin="24,12,24,16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid>
+            <ui:TextBlock FontTypography="Title" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{l:T Page.Findings}" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <ui:ProgressRing x:Name="Ring" IsIndeterminate="True" Width="18" Height="18" Margin="0,0,8,0" />
+                <ui:TextBlock Text="{Binding ScanText}" VerticalAlignment="Center" Appearance="Secondary" Margin="0,0,12,0" MaxWidth="360" TextTrimming="CharacterEllipsis" />
+                <ui:Button x:Name="RecheckButton" Content="{l:T Findings.Recheck}" Icon="{ui:SymbolIcon ArrowSync24}" Margin="0,0,8,0" />
+                <ui:Button x:Name="ScanButton" Content="{l:T Scan.Button}" Icon="{ui:SymbolIcon Search24}" IsEnabled="{Binding Idle}" />
+            </StackPanel>
+        </Grid>
+
+        <WrapPanel Grid.Row="1" Margin="0,12,0,8" VerticalAlignment="Center">
+            <ui:TextBlock Text="{l:T Findings.Older}" VerticalAlignment="Center" Margin="0,0,6,0" />
+            <ui:NumberBox x:Name="AgeBox" Width="76" Minimum="0" Maximum="3650" MaxDecimalPlaces="0" SmallChange="30" SpinButtonPlacementMode="Hidden" ClearButtonEnabled="False" />
+            <ui:TextBlock Text="{l:T Findings.Days}" VerticalAlignment="Center" Margin="6,0,12,0" />
+            <ui:TextBlock Text="{l:T Findings.SizeFrom}" VerticalAlignment="Center" Margin="0,0,6,0" />
+            <ui:NumberBox x:Name="SizeBox" Width="84" Minimum="0" Maximum="1000000" MaxDecimalPlaces="0" SmallChange="50" SpinButtonPlacementMode="Hidden" ClearButtonEnabled="False" />
+            <ui:TextBlock Text="{l:T Findings.Mb}" VerticalAlignment="Center" Margin="6,0,12,0" />
+            <ComboBox x:Name="CategoryBox" MinWidth="150" Margin="0,0,8,0" />
+            <ui:Button x:Name="RecommendButton" Content="{l:T Findings.Recommend}" Icon="{ui:SymbolIcon CheckmarkCircle24}" />
+        </WrapPanel>
+
+        <ui:DataGrid x:Name="Grid" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column"
+                     SelectionMode="Single" CanUserAddRows="False" CanUserReorderColumns="False" GridLinesVisibility="None"
+                     EnableRowVirtualization="True" VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                     VirtualizingPanel.VirtualizationMode="Recycling" RowHeight="44" IsSynchronizedWithCurrentItem="False">
+            <DataGrid.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate>
+                            <ui:TextBlock Text="{Binding Name}" FontTypography="BodyStrong" Margin="8,12,0,4" />
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                </GroupStyle>
+            </DataGrid.GroupStyle>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Width="48">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type f:Unit}">
+                            <CheckBox IsChecked="{Binding Selected, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanSelect}"
+                                      MinWidth="0" Margin="10,0,0,0" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="{l:T Findings.Name}" Width="*" SortMemberPath="Title">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type f:Unit}">
+                            <StackPanel VerticalAlignment="Center" ToolTip="{Binding Path}">
+                                <ui:TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+                                <ui:TextBlock Text="{Binding ShortPath}" FontTypography="Caption" Appearance="Tertiary" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="{l:T Findings.Size}" Width="92" SortMemberPath="Bytes">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type f:Unit}">
+                            <ui:TextBlock Text="{Binding SizeText}" FontTypography="BodyStrong" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="{l:T Findings.Used}" Width="128" SortMemberPath="LastUsed">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type f:Unit}">
+                            <StackPanel VerticalAlignment="Center">
+                                <ui:TextBlock Text="{Binding UsedText}" />
+                                <ui:TextBlock Text="{Binding SourceText}" FontTypography="Caption" Appearance="Tertiary" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="{l:T Findings.Status}" Width="160" SortMemberPath="Status">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type f:Unit}">
+                            <ui:TextBlock x:Name="S" Text="{Binding StatusText}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" ToolTip="{Binding StatusText}" />
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding CanSelect}" Value="False">
+                                    <Setter TargetName="S" Property="Foreground" Value="{DynamicResource SystemFillColorCautionBrush}" />
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="{l:T Findings.Rebuild}" Width="140">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type f:Unit}">
+                            <ui:TextBlock Text="{Binding RebuildText}" VerticalAlignment="Center" Appearance="Secondary" TextTrimming="CharacterEllipsis" ToolTip="{Binding RebuildText}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </ui:DataGrid>
+        <ui:TextBlock x:Name="EmptyText" Grid.Row="2" Text="{l:T Findings.Empty}" Appearance="Tertiary" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" />
+
+        <ui:Card x:Name="Details" Grid.Row="3" Margin="0,8,0,0" Padding="14,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBox x:Name="DetailPath" IsReadOnly="True" BorderThickness="0" Background="Transparent" Padding="0" TextWrapping="Wrap" />
+                    <ui:TextBlock x:Name="DetailText" FontTypography="Caption" Appearance="Secondary" TextWrapping="Wrap" Margin="0,4,0,0" />
+                </StackPanel>
+                <ui:Button x:Name="ExplorerButton" Grid.Column="1" Content="{l:T Findings.Explorer}" Icon="{ui:SymbolIcon FolderOpen24}" VerticalAlignment="Top" Margin="12,0,0,0" />
+            </Grid>
+        </ui:Card>
+
+        <Grid Grid.Row="4" Margin="0,10,0,0">
+            <ui:TextBlock Text="{Binding SelectedText}" FontTypography="BodyStrong" VerticalAlignment="Center" />
+            <ui:Button x:Name="MoveButton" Appearance="Primary" HorizontalAlignment="Right" Content="{l:T Findings.Move}" Icon="{ui:SymbolIcon ArchiveArrowBack24}" />
+        </Grid>
+    </Grid>
+</Page>

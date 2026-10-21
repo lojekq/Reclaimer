@@ -10,9 +10,10 @@ public static class Format
 
     public static string Size(long bytes) => bytes switch
     {
+        >= 1000L << 30 => string.Format(C, Loc.T("Size.TB"), bytes / (double)(1L << 40)),
         >= 1L << 30 => string.Format(C, Loc.T("Size.GB"), bytes / (double)(1L << 30)),
         >= 1L << 20 => string.Format(C, Loc.T("Size.MB"), bytes / (double)(1L << 20)),
-        _ => string.Format(C, Loc.T("Size.KB"), Math.Max(1, bytes / 1024)),
+        _ => string.Format(C, Loc.T("Size.KB"), bytes == 0 ? 0 : Math.Max(1, bytes / 1024)),
     };
 
     public static string Ago(DateTime? utc)
@@ -22,6 +23,7 @@ public static class Format
         return days switch
         {
             0 => Loc.T("Age.Today"),
+            1 => Loc.T("Age.Yesterday"),
             < 90 => string.Format(C, Loc.T("Age.Days"), days),
             < 730 => string.Format(C, Loc.T("Age.Months"), days / 30),
             _ => string.Format(C, Loc.T("Age.Years"), days / 365),
