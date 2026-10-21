@@ -4,7 +4,7 @@
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:l="clr-namespace:Reclaimer.Shell"
       xmlns:f="clr-namespace:Reclaimer.Features"
-      Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+      Foreground="{DynamicResource TextFillColorPrimaryBrush}" ScrollViewer.CanContentScroll="False">
     <Grid Margin="24,12,24,16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -49,15 +49,15 @@
                 </GroupStyle>
             </DataGrid.GroupStyle>
             <DataGrid.Columns>
-                <DataGridTemplateColumn Width="48">
+                <DataGridTemplateColumn Width="56" MinWidth="56">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="{x:Type f:Unit}">
                             <CheckBox IsChecked="{Binding Selected, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanSelect}"
-                                      MinWidth="0" Margin="10,0,0,0" VerticalAlignment="Center" />
+                                      MinWidth="0" Margin="16,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="{l:T Findings.Name}" Width="*" SortMemberPath="Title">
+                <DataGridTemplateColumn Header="{l:T Findings.Name}" Width="2.4*" MinWidth="180" SortMemberPath="Title">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="{x:Type f:Unit}">
                             <StackPanel VerticalAlignment="Center" ToolTip="{Binding Path}">
@@ -67,14 +67,14 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="{l:T Findings.Size}" Width="92" SortMemberPath="Bytes">
+                <DataGridTemplateColumn Header="{l:T Findings.Size}" Width="90" MinWidth="90" SortMemberPath="Bytes">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="{x:Type f:Unit}">
                             <ui:TextBlock Text="{Binding SizeText}" FontTypography="BodyStrong" VerticalAlignment="Center" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="{l:T Findings.Used}" Width="128" SortMemberPath="LastUsed">
+                <DataGridTemplateColumn Header="{l:T Findings.Used}" Width="*" MinWidth="110" SortMemberPath="LastUsed">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="{x:Type f:Unit}">
                             <StackPanel VerticalAlignment="Center">
@@ -84,7 +84,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="{l:T Findings.Status}" Width="160" SortMemberPath="Status">
+                <DataGridTemplateColumn Header="{l:T Findings.Status}" Width="*" MinWidth="120" SortMemberPath="Status">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="{x:Type f:Unit}">
                             <ui:TextBlock x:Name="S" Text="{Binding StatusText}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" ToolTip="{Binding StatusText}" />
@@ -96,7 +96,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="{l:T Findings.Rebuild}" Width="140">
+                <DataGridTemplateColumn Header="{l:T Findings.Rebuild}" Width="*" MinWidth="110">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="{x:Type f:Unit}">
                             <ui:TextBlock Text="{Binding RebuildText}" VerticalAlignment="Center" Appearance="Secondary" TextTrimming="CharacterEllipsis" ToolTip="{Binding RebuildText}" />

@@ -78,7 +78,7 @@
   <data name="Findings.Size" xml:space="preserve"><value>Размер</value></data>
   <data name="Findings.Used" xml:space="preserve"><value>Давность</value></data>
   <data name="Findings.Status" xml:space="preserve"><value>Статус</value></data>
-  <data name="Findings.Rebuild" xml:space="preserve"><value>Как вернётся</value></data>
+  <data name="Findings.Rebuild" xml:space="preserve"><value>Возврат</value></data>
   <data name="Findings.Empty" xml:space="preserve"><value>Пока пусто. Нажми «Сканировать»: оно только читает, ничего не двигает.</value></data>
   <data name="Findings.Explorer" xml:space="preserve"><value>Показать в проводнике</value></data>
   <data name="Findings.Selected" xml:space="preserve"><value>Выбрано: {0} · ≈ {1}</value></data>

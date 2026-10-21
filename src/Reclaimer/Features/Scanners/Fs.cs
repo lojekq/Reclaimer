@@ -55,6 +55,11 @@ public static class Fs
         : AtimeTrusted && s.Accessed > s.Modified.AddMinutes(1) ? (s.Accessed, UsedSource.Accessed)
         : (s.Modified, UsedSource.Modified);
 
+    /// <summary>
+    /// For the log: type, HRESULT and stack, never the message. IO messages carry paths, and logs get attached to public issues (00-shared §2.3).
+    /// </summary>
+    public static string Describe(Exception e) => $"{e.GetType().Name} 0x{e.HResult:X8}{Environment.NewLine}{e.StackTrace}";
+
     /// <summary>"node_modules" next to "package.json" etc. Missing or unreadable = false.</summary>
     public static bool Any(string dir, string pattern)
     {

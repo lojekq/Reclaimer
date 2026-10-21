@@ -4,7 +4,7 @@
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:l="clr-namespace:Reclaimer.Shell"
       xmlns:f="clr-namespace:Reclaimer.Features"
-      Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+      Foreground="{DynamicResource TextFillColorPrimaryBrush}" ScrollViewer.CanContentScroll="False">
     <Grid Margin="24,12,24,16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

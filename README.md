@@ -3,7 +3,7 @@
 
 # Reclaimer
 
-**Skeleton for small Windows tray apps: one exe, RU/EN, light and dark, releases from CI.**
+**Get back tens of gigabytes from AI models, package caches and stale build folders, with a 7-day undo.**
 
 **English** · [Русский](README.ru.md)
 
@@ -14,35 +14,47 @@
 [![License](https://img.shields.io/github/license/lojekq/Reclaimer)](LICENSE)
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/main-dark-en.png">
-  <img src="docs/main-light-en.png" width="820" alt="Reclaimer main window">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/findings-dark-en.png">
+  <img src="docs/findings-light-en.png" width="820" alt="Reclaimer findings: models, caches and build folders with size and last use">
 </picture>
 </div>
 
-
 ## Why
 
-Every small Windows utility needs the same boring parts: a tray icon, settings, autostart, two languages, a crash log and a release with checksums.
-Reclaimer has them done once, so an app only adds its own pages.
+A year of local AI and side projects quietly eats a disk: a 40 GB model you tried once, a Hugging Face cache, `node_modules` and `target` in projects you forgot.
+Generic cleaners don't know these places, and "biggest files" tools leave you guessing what is safe. Reclaimer knows them, says when each was last used, and nothing is deleted right away.
 
 ## Features
 
-- **Tray first** — left click opens the window, the cross hides it, Exit is in the tray menu.
-- **One exe** — no installer and no admin rights; a Start menu shortcut and autostart are switches in Settings.
-- **English and Russian, light and dark** — follows Windows or your choice.
-- **Honest updates** — once a day it asks GitHub about a new release, shows a note and downloads nothing.
-- **Crash log** — if it fails, it stops and shows where the log is; nothing is sent anywhere.
+- **Knows the places** — Hugging Face, Ollama, LM Studio, ComfyUI, pip, uv, npm, pnpm, NuGet and Cargo, plus model folders you add.
+- **Stale projects** — `node_modules`, `target`, `bin`/`obj`, `.venv`, `.next` in projects untouched for 90+ days, with the last commit date.
+- **Honest "last used"** — and how it knows: last commit, modified, opened (only when NTFS records it), or "unknown".
+- **7-day undo** — moved items wait in a quarantine on the same disk; one click brings them back.
+- **Whitelist only** — it never touches anything outside known places and won't move models while Ollama or LM Studio is running.
+- **WSL and Docker disks** — shows how big your `ext4.vhdx` and `docker_data.vhdx` really are (report only).
 
 ## See it in action
 
-![Reclaimer demo](docs/demo-en.gif)
+![Reclaimer demo: scan, pick three old build folders, move them, restore one](docs/demo-en.gif)
 
 ## Screenshots
 
 | | Light | Dark |
 |---|---|---|
-| Settings | ![Settings, light](docs/settings-light-en.png) | ![Settings, dark](docs/settings-dark-en.png) |
-| About | ![About, light](docs/about-light-en.png) | ![About, dark](docs/about-dark-en.png) |
+| Overview | ![Overview, light](docs/overview-light-en.png) | ![Overview, dark](docs/overview-dark-en.png) |
+| Confirmation | ![Confirmation, light](docs/confirm-light-en.png) | ![Confirmation, dark](docs/confirm-dark-en.png) |
+| Quarantine | ![Quarantine, light](docs/quarantine-light-en.png) | ![Quarantine, dark](docs/quarantine-dark-en.png) |
+| WSL and Docker | ![WSL and Docker, light](docs/disks-light-en.png) | ![WSL and Docker, dark](docs/disks-dark-en.png) |
+
+## How it works
+
+Reclaimer only looks where it knows what lives: the cache folders of each tool (their environment variables included) and build folders next to their marker: `node_modules` by `package.json`, `target` by `Cargo.toml`, `bin`+`obj` by a `.csproj` with `obj\project.assets.json`.
+In a git repository a build folder is offered only if git says it is ignored. Scanning only reads; nothing changes until you confirm a list with every path and size.
+An Ollama model is its manifest plus the layers no other model uses; a Hugging Face repo takes along the shared files only it links to.
+
+"Moving to the quarantine" is a rename on the same disk, so it is instant and atomic: there is no copy that could stop half-way. A journal is written next to the data before the first rename.
+The space comes back when the quarantine is cleaned: by itself after 7 days (1–30 in Settings), or now with **Delete now**.
+"Last used" is the last commit for projects, otherwise the newest file date. NTFS can also record when a file was last opened; Reclaimer uses that only when it is turned on (`NtfsDisableLastAccessUpdate`). When it can't tell, it says "unknown".
 
 ## Download
 
@@ -54,20 +66,23 @@ Requirements: Windows 11 x64. Windows 10 22H2 should work but is not tested.
 
 ## First run
 
-Put the exe into a permanent folder first, for example `%LOCALAPPDATA%\Programs\Reclaimer\`: autostart and the shortcut point to it.
-On the first start Windows may show a SmartScreen warning (see FAQ). The app then lives in the tray; turn on **Start with Windows** in Settings.
+Put the exe into `%LOCALAPPDATA%\Programs\Reclaimer\` first. From there it starts with Windows by default, because the quarantine is cleaned by the running app; from any other folder autostart stays off until you turn it on.
+On the first start Windows may show a SmartScreen warning (see FAQ). Add your project folders on the Overview page, press **Scan**, tick what you don't need and press **Move to quarantine**. Models are never ticked for you.
 
 ## Settings
 
 | Setting | Default | What it does |
 |---|---|---|
-| Language | Windows language | English or Russian, applied after a restart |
-| Theme | Windows theme | Light or dark |
-| Start with Windows | off | Starts minimized to the tray |
-| Start menu shortcut | on when the exe is in `%LOCALAPPDATA%\Programs\Reclaimer\` | A shortcut in the Start menu |
-| Check for updates | on | Once a day asks GitHub about a new release |
+| Project folders | none | Searched for build folders, up to 6 levels deep |
+| Abandoned after | 90 days | What **Mark recommended** picks (models are never picked) |
+| Keep in quarantine | 7 days | 1–30; then the item is deleted for good |
+| Minimum size | 50 MB | Smaller findings are hidden |
+| Model folders | none | ComfyUI `models`, GGUF folders: files of 100 MB and more |
+| Own cache folders | none | Moved as a whole: only folders a tool refills by itself |
+| Excluded folders | none | Never scanned or moved |
+| Language, theme, Start with Windows, Start menu shortcut, check for updates | | As in every app of the set |
 
-Settings and logs live in `%APPDATA%\Reclaimer`.
+Settings, the action history (`history.jsonl`) and logs live in `%APPDATA%\Reclaimer`. The quarantine is `%LOCALAPPDATA%\Reclaimer\Quarantine` on the system disk and a hidden `.reclaimer-quarantine` folder on other disks.
 
 ## FAQ
 
@@ -80,19 +95,36 @@ Smart App Control, if it is on, blocks unsigned files with no way to allow one; 
 
 <details><summary>My antivirus flags it</summary>
 
-It is a false positive: the app has no installer, no packer and no obfuscation. Please report it to your antivirus vendor
-and open an issue with the detection name and the SHA256 of the file.
+Reclaimer renames and deletes folders, which heuristics watch for. It never deletes outside its quarantine, has no packer and no obfuscation; the code is all here.
+Please report the false positive to your antivirus vendor and open an issue with the detection name and the SHA256 of the file.
+</details>
+
+<details><summary>Why didn't my free space grow after moving?</summary>
+
+A rename keeps the data on the same disk, which is what makes the undo instant. The space is freed when the quarantine is cleaned: after the retention period, or now with **Delete now** or **Clean all now** on the Quarantine page.
+For pnpm and uv some files may be hardlinks shared with projects, so the freed space can be smaller than shown; the number in the notification is measured on the disk.
+</details>
+
+<details><summary>A row says "Owner running" or "Files in use"</summary>
+
+Reclaimer doesn't close programs. Close Ollama, LM Studio, the build or whatever holds the files, then press **Check again**. A row "Not in .gitignore" is a folder git tracks: it may hold your own files, so it can't be picked.
+</details>
+
+<details><summary>Controlled folder access blocked the move</summary>
+
+Windows Security protects Documents, Desktop and other folders from programs it doesn't know. Nothing was changed. To allow it: Windows Security → Virus &amp; threat protection → Ransomware protection → Allow an app through Controlled folder access.
 </details>
 
 <details><summary>How do I uninstall?</summary>
 
-About → **Remove data and autostart**, then delete the exe.
+First restore or clean the quarantine: **Remove data and autostart** refuses while it holds anything, since the journal would go with the data. Then About → **Remove data and autostart**, and delete the exe.
 </details>
 
 ## Privacy
 
 No telemetry. The only network request is the update check: `GET https://api.github.com/repos/lojekq/Reclaimer/releases/latest` once a day; turn it off in Settings.
-Logs contain no window titles, paths or other personal data.
+It runs `git.exe` (with `core.fsmonitor=false`) to ask whether a folder is ignored and when the last commit was, and `wsl.exe --list --running`; both stay on this PC.
+`history.jsonl` keeps the paths of what was moved, restored and deleted on this PC. Logs contain no paths.
 
 ## Build from source
 
@@ -103,6 +135,8 @@ cd Reclaimer
 dotnet run --project src/Reclaimer
 dotnet test
 ```
+
+A Debug build only moves and deletes inside `C:\Demo\reclaimer-sandbox`; `pwsh tools/sandbox.ps1` creates it with placeholder files.
 
 ## License
 

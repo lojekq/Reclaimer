@@ -123,7 +123,7 @@ public sealed class Model : INotifyPropertyChanged
         catch (OperationCanceledException) { ScanText = Loc.T("Scan.Cancelled"); }
         catch (Exception e)
         {
-            Log.Error("scan", e);
+            Log.Error($"scan: {Fs.Describe(e)}");
             ScanText = Loc.T("Scan.Failed");
         }
         finally
@@ -207,7 +207,9 @@ public sealed class Model : INotifyPropertyChanged
         Busy = true;
         try
         {
-            var (freed, errors) = await Task.Run(() => PurgeNow(list, exit.Token));
+            var t = Task.Run(() => PurgeNow(list, exit.Token));
+            work = t;
+            var (freed, errors) = await t;
             if (freed > 0) Tray.Notify(AppInfo.DisplayName, string.Format(Loc.T("Notify.Freed"), Format.Size(freed)));
             return errors.FirstOrDefault();
         }
@@ -235,7 +237,7 @@ public sealed class Model : INotifyPropertyChanged
             catch (OperationCanceledException) { break; } // stays Purging, finished on the next start
             catch (Exception x) when (x is IOException or UnauthorizedAccessException)
             {
-                Log.Warn("purge", x);
+                Log.Warn($"purge: {Fs.Describe(x)}");
                 errors.Add("Purge.Failed");
             }
         }
@@ -276,7 +278,7 @@ public sealed class Model : INotifyPropertyChanged
             }
         }
         catch (OperationCanceledException) { }
-        catch (Exception e) { Log.Error("autoclean", e); }
+        catch (Exception e) { Log.Error($"autoclean: {Fs.Describe(e)}"); }
     }
 
     // ------------------------------------------------------------ views
@@ -287,7 +289,7 @@ public sealed class Model : INotifyPropertyChanged
         {
             Entries.Clear();
             try { foreach (var e in Quarantine.List().OrderByDescending(e => e.CreatedUtc)) Entries.Add(e); }
-            catch (Exception x) { Log.Error("quarantine list", x); }
+            catch (Exception x) { Log.Error($"quarantine list: {Fs.Describe(x)}"); }
         }
         Changed(nameof(QuarantineBytes));
         Changed(nameof(QuarantineText));

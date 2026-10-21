@@ -157,7 +157,7 @@ public static class Quarantine
         }
         catch (Exception x) when (x is IOException or UnauthorizedAccessException)
         {
-            Log.Warn("journal not written", x);
+            Log.Warn($"journal not written: {Fs.Describe(x)}");
             TryDeleteTree(e.Dir, root);
             return "Move.JournalFailed";
         }
@@ -331,7 +331,7 @@ public static class Quarantine
     static void TryDeleteTree(string path, string boundary)
     {
         try { DeleteTree(path, boundary, default); }
-        catch (Exception x) { Log.Warn("cleanup failed", x); }
+        catch (Exception x) { Log.Warn($"cleanup failed: {Fs.Describe(x)}"); }
     }
 
     // ---------------------------------------------------------------- Reconcile
@@ -365,7 +365,7 @@ public static class Quarantine
                         break;
                 }
             }
-            catch (Exception x) { Log.Error("reconcile", x); }
+            catch (Exception x) { Log.Error($"reconcile: {Fs.Describe(x)}"); }
         }
     }
 
@@ -410,7 +410,7 @@ public static class Quarantine
         }
         catch (Exception x) when (x is IOException or UnauthorizedAccessException)
         {
-            Log.Warn("no quarantine on this volume", x);
+            Log.Warn($"no quarantine on this volume: {Fs.Describe(x)}");
             return "Status.NoQuarantine";
         }
     }
@@ -433,7 +433,7 @@ public static class Quarantine
             if (e is not null) e.Dir = dir;
             return e;
         }
-        catch (Exception x) when (x is IOException or UnauthorizedAccessException) { Log.Warn("entry unreadable", x); return null; }
+        catch (Exception x) when (x is IOException or UnauthorizedAccessException) { Log.Warn($"entry unreadable: {Fs.Describe(x)}"); return null; }
     }
 
     static void Write(Entry e) => AtomicFile.WriteAllText(Path.Combine(e.Dir, EntryFile), JsonSerializer.Serialize(e, Json));
@@ -441,7 +441,7 @@ public static class Quarantine
     static string? TryWrite(Entry e)
     {
         try { Write(e); return null; }
-        catch (Exception x) when (x is IOException or UnauthorizedAccessException) { Log.Warn("entry not written", x); return "Move.JournalFailed"; }
+        catch (Exception x) when (x is IOException or UnauthorizedAccessException) { Log.Warn($"entry not written: {Fs.Describe(x)}"); return "Move.JournalFailed"; }
     }
 
     /// <summary>history.jsonl: a line per action. Local only; paths are fine here (they never go to the log, 00-shared §2.3).</summary>
@@ -460,6 +460,6 @@ public static class Quarantine
                 File.AppendAllText(HistoryPath, line + "\n");
             }
         }
-        catch (Exception x) { Log.Warn("history not written", x); }
+        catch (Exception x) { Log.Warn($"history not written: {Fs.Describe(x)}"); }
     }
 }

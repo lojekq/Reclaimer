@@ -77,7 +77,7 @@ public static class Dialog
         body.Children.Add(new ScrollViewer { Content = list, MaxHeight = 220, VerticalScrollBarVisibility = ScrollBarVisibility.Auto });
 
         var copy = new Button { Content = Loc.T("Confirm.Copy"), Icon = new SymbolIcon(SymbolRegular.Copy24), Margin = new(0, 8, 0, 8) };
-        copy.Click += (_, _) => { try { Clipboard.SetText(Markdown(units)); } catch (Exception e) { Log.Warn("clipboard", e); } };
+        copy.Click += (_, _) => { try { Clipboard.SetText(Markdown(units)); } catch (Exception e) { Log.Warn($"clipboard: {Fs.Describe(e)}"); } };
         body.Children.Add(copy);
 
         body.Children.Add(Text(string.Format(Loc.T("Confirm.Total"), total, days, Format.Date(DateTime.UtcNow.AddDays(days)))));

@@ -78,7 +78,7 @@ Open the folder?</value></data>
   <data name="Findings.Size" xml:space="preserve"><value>Size</value></data>
   <data name="Findings.Used" xml:space="preserve"><value>Last used</value></data>
   <data name="Findings.Status" xml:space="preserve"><value>Status</value></data>
-  <data name="Findings.Rebuild" xml:space="preserve"><value>How it comes back</value></data>
+  <data name="Findings.Rebuild" xml:space="preserve"><value>Comes back</value></data>
   <data name="Findings.Empty" xml:space="preserve"><value>Nothing here yet. Press Scan: it only reads, nothing is moved.</value></data>
   <data name="Findings.Explorer" xml:space="preserve"><value>Show in Explorer</value></data>
   <data name="Findings.Selected" xml:space="preserve"><value>Selected: {0} · ≈ {1}</value></data>

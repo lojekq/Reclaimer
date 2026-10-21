@@ -46,7 +46,7 @@ public static class Scan
                 foreach (var u in job.Run())
                     if (Finish(u, names)) found(u);
             }
-            catch (Exception e) when (e is not OperationCanceledException) { Log.Warn($"scan {job.Name} failed", e); }
+            catch (Exception e) when (e is not OperationCanceledException) { Log.Warn($"scan {job.Name} failed: {Fs.Describe(e)}"); }
             return ValueTask.CompletedTask;
         });
         return VhdxScanner.Scan(names);

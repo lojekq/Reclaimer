@@ -326,6 +326,31 @@ public class SafetyTests
     }
 
     [TestMethod]
+    public void RunningOwnerBlocksTheMove()
+    {
+        var src = Mk("src");
+        var cache = Mk(@"src\cache");
+        Mk(@"src\cache\a.bin", "a");
+        // A real process whose name starts with the owner prefix: a copy of ping that ends by itself (nothing else is killed).
+        // Not named "ollama": the VRAM Bouncer session on this PC watches for that name.
+        var exe = Path.Combine(dir, "reclaimer-owner-test.exe");
+        File.Copy(Path.Combine(Environment.SystemDirectory, "PING.EXE"), exe);
+        using var p = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(exe, "-n 4 127.0.0.1") { CreateNoWindow = true, UseShellExecute = false })!;
+        var u = new Unit
+        {
+            Id = cache, Location = "test", Category = Category.Caches, Title = "cache", Root = src, Owners = ["reclaimer-owner-test"],
+            Parts = [new(cache, true, Fs.Size(cache))], Bytes = Fs.Size(cache),
+        };
+        Assert.AreEqual("Status.OwnerRunning", Quarantine.Move(u, 7));
+        Assert.AreEqual(UnitStatus.OwnerRunning, u.Status);
+        Assert.AreEqual("reclaimer-owner-test", u.Owner);
+        Assert.IsTrue(File.Exists(Path.Combine(cache, "a.bin")));
+        Assert.IsTrue(p.WaitForExit(10_000));
+        u.Status = UnitStatus.Ready;                                           // "Check again"
+        Assert.IsNull(Quarantine.Move(u, 7));
+    }
+
+    [TestMethod]
     public void DebugSandboxRefusesOutside()
     {
         var src = Mk("src");

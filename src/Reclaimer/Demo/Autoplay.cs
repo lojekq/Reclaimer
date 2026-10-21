@@ -25,8 +25,8 @@ public static class Autoplay
             (4.7, () => Pick(old[1])),
             (5.1, () => Pick(old[2])),
             (5.7, () => _ = Dialog.Confirm()),
-            (7.2, () => ClickPrimary(w)),
-            (8.6, () => { if (Model.I.Entries.Count > 1) _ = Model.I.RestoreAsync(Model.I.Entries[1]); }),
+            (7.0, () => ClickPrimary(w)),
+            (9.3, () => { if (Model.I.Entries.Count > 1) _ = Model.I.RestoreAsync(Model.I.Entries[1]); }),
         ];
         var started = DateTime.UtcNow;
         var next = 0;
