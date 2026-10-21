@@ -21,6 +21,9 @@ public static class SettingsSection
         panel.Children.Add(Number("Settings.AgeDays", SymbolRegular.Clock24, s.AgeDays, 1, 3650, v => s.AgeDays = v));
         panel.Children.Add(Number("Settings.QuarantineDays", SymbolRegular.Archive24, s.QuarantineDays, 1, 30, v => s.QuarantineDays = v));
         panel.Children.Add(Number("Settings.MinSize", SymbolRegular.Filter24, s.MinSizeMb, 0, 1_000_000, v => s.MinSizeMb = v));
+        var remind = new ToggleSwitch { IsChecked = s.RemindWeekly };
+        remind.Click += (_, _) => { s.RemindWeekly = remind.IsChecked == true; Settings.Save(); };
+        panel.Children.Add(new CardControl { Header = Loc.T("Settings.Remind"), Icon = new SymbolIcon(SymbolRegular.Alert24), Content = remind, Margin = new(0, 0, 0, 4) });
         panel.Children.Add(Folders("Settings.ModelDirs", SymbolRegular.BrainCircuit24, s.ModelDirs, "Settings.ModelDirs.Note"));
         panel.Children.Add(Folders("Settings.ExtraCaches", SymbolRegular.BoxMultiple24, s.ExtraCacheDirs, "Settings.ExtraCaches.Note"));
         panel.Children.Add(Folders("Settings.Excluded", SymbolRegular.ShieldProhibited24, s.Excluded, "Settings.Excluded.Note"));

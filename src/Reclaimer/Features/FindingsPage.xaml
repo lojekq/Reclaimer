@@ -19,6 +19,7 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                 <ui:ProgressRing x:Name="Ring" IsIndeterminate="True" Width="18" Height="18" Margin="0,0,8,0" />
                 <ui:TextBlock Text="{Binding ScanText}" VerticalAlignment="Center" Appearance="Secondary" Margin="0,0,12,0" MaxWidth="360" TextTrimming="CharacterEllipsis" />
+                <ui:Button x:Name="ExportButton" Content="{l:T Findings.Export}" Icon="{ui:SymbolIcon ArrowDownload24}" Margin="0,0,8,0" />
                 <ui:Button x:Name="RecheckButton" Content="{l:T Findings.Recheck}" Icon="{ui:SymbolIcon ArrowSync24}" Margin="0,0,8,0" />
                 <ui:Button x:Name="ScanButton" Content="{l:T Scan.Button}" Icon="{ui:SymbolIcon Search24}" IsEnabled="{Binding Idle}" />
             </StackPanel>

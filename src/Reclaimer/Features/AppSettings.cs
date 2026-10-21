@@ -12,6 +12,8 @@ namespace Reclaimer.Shell
         public List<string> Excluded { get; set; } = [];
         public List<string> QuarantineRoots { get; set; } = [];  // roots made on other volumes, for Reconcile and the list
         public DateTime? LastScanUtc { get; set; }
+        public bool RemindWeekly { get; set; }           // v1.0: "≈N GB can be reclaimed" once a week, off by default
+        public DateTime? LastReminderUtc { get; set; }
     }
 }
 

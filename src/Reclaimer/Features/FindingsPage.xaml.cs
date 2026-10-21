@@ -39,6 +39,7 @@ public partial class FindingsPage
         ScanButton.Click += (_, _) => _ = Model.I.ScanAsync();
         RecommendButton.Click += (_, _) => Model.I.MarkRecommended(view.Cast<Unit>());
         RecheckButton.Click += (_, _) => Model.I.RecheckOwners();
+        ExportButton.Click += (_, _) => Report.Export();
         MoveButton.Click += (_, _) => _ = Dialog.Confirm();
         ExplorerButton.Click += (_, _) =>
         {
@@ -75,6 +76,7 @@ public partial class FindingsPage
         Ring.Visibility = Model.I.Scanning ? Visibility.Visible : Visibility.Collapsed;
         EmptyText.Visibility = view.IsEmpty && !Model.I.Scanning ? Visibility.Visible : Visibility.Collapsed;
         MoveButton.IsEnabled = Model.I.AnySelected && Model.I.Idle;
+        ExportButton.IsEnabled = Model.I.Units.Count > 0 && !Model.I.Scanning;
     }
 
     void ShowDetails(Unit? u)

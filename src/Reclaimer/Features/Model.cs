@@ -30,6 +30,7 @@ public sealed class Model : INotifyPropertyChanged
     public ObservableCollection<Disk> Disks { get; } = [];
     public ObservableCollection<VolumeView> Volumes { get; } = [];
     public ObservableCollection<TileView> Tiles { get; } = [];
+    public ObservableCollection<HistoryRow> History { get; } = [];
 
     bool scanning;
     public bool Scanning { get => scanning; private set { scanning = value; Changed(); Changed(nameof(Idle)); } }
@@ -274,11 +275,28 @@ public sealed class Model : INotifyPropertyChanged
                             RefreshVolumes();
                         });
                 }
+                if (!busyNow) await RemindIfDue();
                 await Task.Delay(busyNow ? TimeSpan.FromMinutes(15) : TimeSpan.FromHours(6), exit.Token);
             }
         }
         catch (OperationCanceledException) { }
         catch (Exception e) { Log.Error($"autoclean: {Fs.Describe(e)}"); }
+    }
+
+    /// <summary>
+    /// Weekly reminder (v1.0, off by default): a quiet read-only scan, then "≈N GB can be reclaimed" if it is 1 GB or more.
+    /// Counts what "Mark recommended" would pick plus old models, i.e. everything selectable and older than the threshold.
+    /// </summary>
+    async Task RemindIfDue()
+    {
+        var s = Settings.Current;
+        if (!s.RemindWeekly || s.LastReminderUtc is { } last && DateTime.UtcNow - last < TimeSpan.FromDays(7)) return;
+        long sum = 0;
+        // ponytail: the scan runs at normal priority on pool threads; fine once a week, lower it if someone notices
+        await Task.Run(() => Scan.Run(u => { if (u.CanSelect && u.AgeDays >= s.AgeDays) Interlocked.Add(ref sum, u.Bytes); }, _ => { }, exit.Token));
+        s.LastReminderUtc = DateTime.UtcNow;
+        Settings.Save();
+        if (sum >= 1L << 30) Tray.Notify(AppInfo.DisplayName, string.Format(Loc.T("Notify.Remind"), Format.Size(sum)), "findings");
     }
 
     // ------------------------------------------------------------ views
@@ -294,6 +312,13 @@ public sealed class Model : INotifyPropertyChanged
         Changed(nameof(QuarantineBytes));
         Changed(nameof(QuarantineText));
         QuarantineChanged?.Invoke();
+    }
+
+    public void RefreshHistory()
+    {
+        if (Args.Current.Demo) return;
+        History.Clear();
+        foreach (var r in Quarantine.ReadHistory()) History.Add(r);
     }
 
     public void RefreshVolumes()

@@ -225,4 +225,20 @@
   <data name="Title.maven" xml:space="preserve"><value>Репозиторий Maven</value></data>
   <data name="Title.go-mod" xml:space="preserve"><value>Кэш модулей Go</value></data>
   <data name="Title.yarn" xml:space="preserve"><value>Кэш Yarn</value></data>
+  <data name="Page.History" xml:space="preserve"><value>История</value></data>
+  <data name="History.Subtitle" xml:space="preserve"><value>Что перемещено, возвращено и удалено и сколько места вернулось. Хранится в %APPDATA%\Reclaimer\history.jsonl.</value></data>
+  <data name="History.Empty" xml:space="preserve"><value>Пока ничего не происходило.</value></data>
+  <data name="History.move" xml:space="preserve"><value>Перемещено</value></data>
+  <data name="History.restore" xml:space="preserve"><value>Возвращено</value></data>
+  <data name="History.purge" xml:space="preserve"><value>Удалено</value></data>
+  <data name="History.reconcile" xml:space="preserve"><value>Возвращено после сбоя</value></data>
+  <data name="History.Ok" xml:space="preserve"><value>готово</value></data>
+  <data name="History.Freed" xml:space="preserve"><value>освобождено {0}</value></data>
+  <data name="History.RolledBack" xml:space="preserve"><value>возвращено после сбоя</value></data>
+  <data name="History.Error" xml:space="preserve"><value>не удалось (ошибка {0})</value></data>
+  <data name="Findings.Export" xml:space="preserve"><value>Экспорт отчёта…</value></data>
+  <data name="Report.Title" xml:space="preserve"><value>Отчёт Reclaimer, {0}</value></data>
+  <data name="Report.Path" xml:space="preserve"><value>Путь</value></data>
+  <data name="Settings.Remind" xml:space="preserve"><value>Раз в неделю напоминать, сколько можно вернуть</value></data>
+  <data name="Notify.Remind" xml:space="preserve"><value>Можно вернуть ≈ {0}: то, чем давно не пользовались</value></data>
 </root>

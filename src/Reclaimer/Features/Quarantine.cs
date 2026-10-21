@@ -7,6 +7,23 @@ namespace Reclaimer.Features;
 
 public enum EntryState { Moving, Done, Restoring, Purging, Broken }
 
+/// <summary>A line of history.jsonl for the History page.</summary>
+public sealed record HistoryRow(DateTime Utc, string Action, string[] Paths, long Bytes, string Result, long Freed)
+{
+    public string WhenText => Utc.ToLocalTime().ToString("g", System.Globalization.CultureInfo.CurrentUICulture);
+    public string ActionText => Loc.T("History." + Action);
+    public string PathText => Paths.Length == 0 ? "" : Dialog.Short(Paths[^1]) + (Paths.Length > 1 ? "  " + string.Format(Loc.T("Confirm.Parts"), Paths.Length) : "");
+    public string SizeText => Format.Size(Bytes);
+    public string ResultText => Result switch
+    {
+        "ok" => Freed > 0 ? string.Format(Loc.T("History.Freed"), Format.Size(Freed)) : Loc.T("History.Ok"),
+        "rolled back" => Loc.T("History.RolledBack"),
+        _ when Result.StartsWith("error ") => string.Format(Loc.T("History.Error"), Result[6..]),
+        _ => Result,
+    };
+    public bool Failed => Result != "ok" && Result != "rolled back";
+}
+
 public sealed class EntryPart
 {
     public string Original { get; set; } = "";  // real path (links in the ancestors resolved) it came from
@@ -442,6 +459,28 @@ public static class Quarantine
     {
         try { Write(e); return null; }
         catch (Exception x) when (x is IOException or UnauthorizedAccessException) { Log.Warn($"entry not written: {Fs.Describe(x)}"); return "Move.JournalFailed"; }
+    }
+
+    /// <summary>The newest <paramref name="max"/> lines of history.jsonl, newest first. A line that doesn't parse is skipped.</summary>
+    public static List<HistoryRow> ReadHistory(int max = 500)
+    {
+        var rows = new List<HistoryRow>();
+        try
+        {
+            if (!File.Exists(HistoryPath)) return rows;
+            foreach (var line in File.ReadLines(HistoryPath).TakeLast(max).Reverse())
+                try
+                {
+                    using var j = JsonDocument.Parse(line);
+                    var r = j.RootElement;
+                    rows.Add(new(r.GetProperty("ts").GetDateTime(), r.GetProperty("action").GetString() ?? "",
+                        r.GetProperty("paths").EnumerateArray().Select(p => p.GetString() ?? "").ToArray(),
+                        r.GetProperty("bytes").GetInt64(), r.GetProperty("result").GetString() ?? "", r.GetProperty("freedBytes").GetInt64()));
+                }
+                catch (Exception e) when (e is JsonException or KeyNotFoundException or InvalidOperationException or FormatException) { }
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { Log.Warn($"history unreadable: {Fs.Describe(e)}"); }
+        return rows;
     }
 
     /// <summary>history.jsonl: a line per action. Local only; paths are fine here (they never go to the log, 00-shared §2.3).</summary>

@@ -50,6 +50,28 @@ public class V1Tests
     }
 
     [TestMethod]
+    public void HistoryReadsNewestFirstAndReportEscapesPipes()
+    {
+        Quarantine.HistoryPath = Mk("history.jsonl", """
+            {"ts":"2026-10-01T00:00:00Z","action":"move","paths":["C:\\a\\node_modules"],"bytes":10,"result":"ok","freedBytes":0}
+            half a line {"ts":
+            {"ts":"2026-10-08T00:00:00Z","action":"purge","paths":["C:\\q\\0-node_modules"],"bytes":10,"result":"ok","freedBytes":8}
+            """);
+        var rows = Quarantine.ReadHistory();
+        Assert.HasCount(2, rows);
+        Assert.AreEqual("purge", rows[0].Action);
+        Assert.AreEqual(8, rows[0].Freed);
+
+        var u = new Unit
+        {
+            Id = "x", Location = "test", Category = Category.Projects, Title = "a|b", Root = @"C:\r", Parts = [new(@"C:\r\a|b", true, 3 << 20)], Bytes = 3 << 20,
+        };
+        var md = Report.Markdown([u], [], [], new DateTime(2026, 10, 21, 14, 30, 0));
+        StringAssert.Contains(md, @"a\|b");
+        StringAssert.Contains(md, "2026-10-21 14:30");
+    }
+
+    [TestMethod]
     public void HfOldRevisionsAndUnfinishedDownloads()
     {
         var hub = Path.Combine(dir, "hub");

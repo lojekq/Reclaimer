@@ -28,6 +28,21 @@ public static class DemoData
             u.Selected = true;
         m.RefreshTiles();
         m.RefreshQuarantine();
+        var now = DateTime.UtcNow;
+        var p = Home + @"\source";
+        foreach (var h in new HistoryRow[]
+        {
+            new(now.AddHours(-2), "restore", [p + @"\website\node_modules"], (long)(0.9 * GB), "ok", 0),
+            new(now.AddDays(-1).AddHours(-1), "move", [Home + @"\.cache\huggingface\hub\models--stabilityai--sdxl-turbo"], (long)(6.9 * GB), "ok", 0),
+            new(now.AddDays(-1).AddHours(-1), "move", [p + @"\cuda-sandbox\.venv"], (long)(2.8 * GB), "ok", 0),
+            new(now.AddDays(-2), "purge", [Home + @"\.ollama\models\blobs\sha256-3f9a", Home + @"\.ollama\models\manifests\registry.ollama.ai\library\phi3\mini"], (long)(2.2 * GB), "ok", (long)(2.2 * GB)),
+            new(now.AddDays(-4), "move", [Home + @"\AppData\Local\NuGet\v3-cache"], (long)(1.1 * GB), "ok", 0),
+            new(now.AddDays(-4), "move", [p + @"\website\node_modules"], (long)(0.9 * GB), "ok", 0),
+            new(now.AddDays(-6), "move", [p + @"\bot\bin", p + @"\bot\obj"], (long)(0.7 * GB), "ok", 0),
+            new(now.AddDays(-9), "purge", [Home + @"\AppData\Local\pip\Cache"], (long)(3.4 * GB), "ok", (long)(3.3 * GB)),
+            new(now.AddDays(-12), "move", [p + @"\game\target"], (long)(4.1 * GB), "error 32", 0),
+        })
+            m.History.Add(h);
     }
 
     /// <summary>The scan of the GIF: rows arrive over ~1.5 s.</summary>

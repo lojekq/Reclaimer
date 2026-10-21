@@ -225,4 +225,20 @@ Open the folder?</value></data>
   <data name="Title.maven" xml:space="preserve"><value>Maven repository</value></data>
   <data name="Title.go-mod" xml:space="preserve"><value>Go module cache</value></data>
   <data name="Title.yarn" xml:space="preserve"><value>Yarn cache</value></data>
+  <data name="Page.History" xml:space="preserve"><value>History</value></data>
+  <data name="History.Subtitle" xml:space="preserve"><value>What was moved, restored and deleted, and how much space came back. Kept in %APPDATA%\Reclaimer\history.jsonl.</value></data>
+  <data name="History.Empty" xml:space="preserve"><value>Nothing has happened yet.</value></data>
+  <data name="History.move" xml:space="preserve"><value>Moved</value></data>
+  <data name="History.restore" xml:space="preserve"><value>Restored</value></data>
+  <data name="History.purge" xml:space="preserve"><value>Deleted</value></data>
+  <data name="History.reconcile" xml:space="preserve"><value>Put back</value></data>
+  <data name="History.Ok" xml:space="preserve"><value>done</value></data>
+  <data name="History.Freed" xml:space="preserve"><value>freed {0}</value></data>
+  <data name="History.RolledBack" xml:space="preserve"><value>put back after a crash</value></data>
+  <data name="History.Error" xml:space="preserve"><value>failed (error {0})</value></data>
+  <data name="Findings.Export" xml:space="preserve"><value>Export report…</value></data>
+  <data name="Report.Title" xml:space="preserve"><value>Reclaimer report, {0}</value></data>
+  <data name="Report.Path" xml:space="preserve"><value>Path</value></data>
+  <data name="Settings.Remind" xml:space="preserve"><value>Weekly reminder of how much can be reclaimed</value></data>
+  <data name="Notify.Remind" xml:space="preserve"><value>≈ {0} can be reclaimed: things you haven't used for a while</value></data>
 </root>

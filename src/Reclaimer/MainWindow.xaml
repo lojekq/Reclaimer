@@ -39,6 +39,8 @@
                                        TargetPageType="{x:Type f:QuarantinePage}" TargetPageTag="quarantine" />
                 <ui:NavigationViewItem Content="{l:T Page.Disks}" Icon="{ui:SymbolIcon Storage24}"
                                        TargetPageType="{x:Type f:DisksPage}" TargetPageTag="disks" />
+                <ui:NavigationViewItem Content="{l:T Page.History}" Icon="{ui:SymbolIcon History24}"
+                                       TargetPageType="{x:Type f:HistoryPage}" TargetPageTag="history" />
             </ui:NavigationView.MenuItems>
             <ui:NavigationView.FooterMenuItems>
                 <ui:NavigationViewItem Content="{l:T Page.Settings}" Icon="{ui:SymbolIcon Settings24}"
