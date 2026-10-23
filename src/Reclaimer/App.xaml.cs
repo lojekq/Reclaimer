@@ -29,10 +29,7 @@ public partial class App : Application
     {
         base.OnStartup(e);
         var a = Args.Current;
-        Crash.Install(this);
-        Scan.UseSandboxInDebug(); // before anything reads a catalog variable
-        Settings.Load();
-        Loc.Apply(Settings.Current.Language);
+        Crash.Install(this); // Settings, Loc and the Debug sandbox variables are already set in Program.Main
         // App hooks that --uninstall needs go here, before the installer: uninstalling must refuse while the quarantine holds data
         RemoveData = RemoveQuarantine;
         if (await Installer.HandleAsync()) // install, update, switch to the installed copy or uninstall: this process is done
