@@ -130,6 +130,53 @@ public class V1Tests
     }
 
     [TestMethod]
+    public void OriginOfModels()
+    {
+        Assert.AreEqual("https://huggingface.co/black-forest-labs/FLUX.1-dev", Origin.Hf(@"C:\hub\models--black-forest-labs--FLUX.1-dev"));
+        Assert.AreEqual("https://huggingface.co/datasets/org/data", Origin.Hf(@"C:\hub\datasets--org--data"));
+        Assert.IsNull(Origin.Hf(@"C:\hub\blobs"));
+        Assert.AreEqual("https://huggingface.co/Qwen/Qwen3-32B-GGUF", Origin.LmStudio(@"C:\u\.lmstudio\models", @"C:\u\.lmstudio\models\Qwen\Qwen3-32B-GGUF\Qwen3-32B-Q4_K_M.gguf"));
+        Assert.IsNull(Origin.LmStudio(@"C:\u\.lmstudio\models", @"C:\u\.lmstudio\models\loose.gguf"));
+
+        var civ = Mk(@"m\lora.safetensors", "w");
+        Mk(@"m\lora.civitai.info", """{"id":3362156,"modelId":2967285,"files":[{"downloadUrl":"https://civitai.com/api/download/models/3362156?fileId=1"}]}""");
+        Assert.AreEqual("https://civitai.com/models/2967285?modelVersionId=3362156", Origin.OfFile(civ));     // .civitai.info: the model page
+        var meta = Mk(@"m\other.safetensors", "w");
+        Mk(@"m\other.metadata.json", """{"from_civitai":true,"preview_url":"","civitai":{"id":10,"modelId":20,"images":[{"url":"https://image.civitai.com/x.jpeg"}]}}""");
+        Assert.AreEqual("https://civitai.com/models/20?modelVersionId=10", Origin.OfFile(meta));              // .metadata.json: ids under "civitai"
+        var llama = Mk(@"m\org_repo_q4.gguf", "w");
+        Mk(@"m\org_repo_q4.gguf.json", """{"url":"https://huggingface.co/org/repo/resolve/main/q4.gguf?download=true","etag":"x"}""");
+        Assert.AreEqual("https://huggingface.co/org/repo/resolve/main/q4.gguf", Origin.OfFile(llama));       // llama.cpp's sidecar
+        var deleted = Mk(@"m\deleted.safetensors", "w");
+        Mk(@"m\deleted.metadata.json", """{"from_civitai":true,"civitai_deleted":true,"preview_url":"","images":[{"url":"https://image.civitai.com/y.jpeg"}]}""");
+        Assert.IsNull(Origin.OfFile(deleted));                                                                // no ids, no source key: previews don't count
+        var zone = Mk(@"m\downloaded.safetensors", "w");
+        File.WriteAllText(zone + ":Zone.Identifier", "[ZoneTransfer]\r\nZoneId=3\r\nReferrerUrl=https://civitai.red/\r\nHostUrl=https://b2.civitai.com/file/x.safetensors?Authorization=secret&b2=1 \r\n");
+        Assert.AreEqual("https://b2.civitai.com/file/x.safetensors", Origin.OfFile(zone));                   // the token in the query never shows
+        var referred = Mk(@"m\referred.safetensors", "w");
+        File.WriteAllText(referred + ":Zone.Identifier", "[ZoneTransfer]\r\nZoneId=3\r\nReferrerUrl=https://example.com/page?x=1\r\n");
+        Assert.AreEqual("https://example.com/page", Origin.OfFile(referred));
+        var cdn = Mk(@"m\cdn.safetensors", "w");
+        File.WriteAllText(cdn + ":Zone.Identifier", "[ZoneTransfer]\r\nZoneId=3\r\nReferrerUrl=https://huggingface.co/org/repo/tree/main\r\nHostUrl=https://us.aws.cdn.hf.co/xet-bridge-us/690dc0e4/fb01e4?X-Xet-Signed=1\r\n");
+        Assert.AreEqual("https://huggingface.co/org/repo/tree/main", Origin.OfFile(cdn));                     // the page beats a hashed CDN object
+        Assert.IsNull(Origin.OfFile(Mk(@"m\own.safetensors", "w")));                                          // trained at home
+
+        Assert.AreEqual("civitai.com", Origin.Site("https://civitai.com/models/1"));
+        Assert.AreEqual("huggingface.co", Origin.Site("https://www.huggingface.co/x"));
+        Assert.AreEqual("ollama pull", Origin.Site("ollama pull llama3.1:70b"));
+        Assert.AreEqual("huggingface.co", Origin.Site("https://us.aws.cdn.hf.co/xet-bridge-us/x"));
+        Assert.AreEqual("civitai.com", Origin.Site("https://b2.civitai.com/file/x.safetensors"));
+        var unknown = new Unit { Id = "x", Location = "own-models", Category = Category.OwnModels, Title = "own.safetensors", Root = dir, Parts = [], Rebuild = "Rebuild.Download" };
+        Assert.IsTrue(unknown.OriginUnknown);
+        var known = new Unit { Id = "y", Location = "own-models", Category = Category.OwnModels, Title = "lora.safetensors", Root = dir, Parts = [], Rebuild = "Rebuild.Download", Origin = "https://civitai.com/models/1" };
+        Assert.IsFalse(known.OriginUnknown);
+        Assert.AreEqual("civitai.com", known.RebuildSub);
+        Assert.AreEqual("https://civitai.com/models/1", known.RebuildTip);
+        var cache = new Unit { Id = "z", Location = "npm", Category = Category.Caches, Title = "npm", Root = dir, Parts = [], Rebuild = "Rebuild.Cache" };
+        Assert.IsFalse(cache.OriginUnknown);                                                                  // only downloads can have an unknown source
+    }
+
+    [TestMethod]
     public void DockerOutputIsParsed()
     {
         var rows = Docker.Parse("""

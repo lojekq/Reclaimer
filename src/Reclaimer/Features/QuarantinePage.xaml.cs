@@ -11,7 +11,7 @@ public partial class QuarantinePage
         InitializeComponent();
         DataContext = Model.I;
         CleanButton.Click += (_, _) => _ = CleanAll();
-        Copy.Attach(List, o => o is Entry e ? (e.Title, e.Original) : null);
+        Copy.Attach(List, o => o is Entry e ? (e.Title, e.Original, null) : null);
         Loaded += (_, _) => { Model.I.QuarantineChanged += Sync; Sync(); };
         Unloaded += (_, _) => Model.I.QuarantineChanged -= Sync;
     }

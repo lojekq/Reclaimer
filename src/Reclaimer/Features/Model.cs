@@ -181,7 +181,7 @@ public sealed class Model : INotifyPropertyChanged
     {
         var age = Settings.Current.AgeDays;
         foreach (var u in visible)
-            u.Selected = u.Category is not (Category.Models or Category.OwnModels) && u.CanSelect && u.AgeDays >= age;
+            u.Selected = u.Category is not (Category.Models or Category.OwnModels) && !u.OriginUnknown && u.CanSelect && u.AgeDays >= age;
     }
 
     // ------------------------------------------------------------ actions

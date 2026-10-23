@@ -49,6 +49,7 @@ public static class ModelFileScanner
                 Id = $"{l.Id}|{f.FullName}", Location = l.Id, Category = Category.Models, Title = f.Name, Root = dir,
                 Parts = [new(f.FullName, false, f.Length, f.LastWriteTimeUtc)], Bytes = f.Length, LastUsed = at, Source = source,
                 Owners = l.Owners, Rebuild = l.Rebuild ?? "Rebuild.Download",
+                Origin = (l.Id == "lmstudio" ? Origin.LmStudio(dir, f.FullName) : null) ?? Origin.OfFile(f.FullName),
             });
         }
         return units;

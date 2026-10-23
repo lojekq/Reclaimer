@@ -307,4 +307,9 @@
   <data name="Settings.Launchers.Note" xml:space="preserve"><value>скрипты и конфиги, которые запускают твои модели (.bat, .ps1, .json…): упомянутая в них модель считается используемой</value></data>
   <data name="Copy.Name" xml:space="preserve"><value>Копировать имя</value></data>
   <data name="Copy.Path" xml:space="preserve"><value>Копировать путь</value></data>
+  <data name="Rebuild.Unknown" xml:space="preserve"><value>Источник неизвестен</value></data>
+  <data name="Rebuild.UnknownTip" xml:space="preserve"><value>Может не восстановиться: неизвестно, откуда этот файл скачан. Проверь, что его можно скачать снова, прежде чем перемещать.</value></data>
+  <data name="Details.Origin" xml:space="preserve"><value>Источник: {0}</value></data>
+  <data name="Confirm.WarnUnknown" xml:space="preserve"><value>У {0} из них источник неизвестен (нет записи о загрузке, нет страницы Civitai или Hugging Face рядом). Если они ещё нужны, убедись, что их можно скачать снова.</value></data>
+  <data name="Copy.Source" xml:space="preserve"><value>Копировать источник</value></data>
 </root>

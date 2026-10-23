@@ -36,7 +36,7 @@ public partial class FindingsPage
         SizeBox.ValueChanged += (_, _) => Refresh();
         CategoryBox.SelectionChanged += (_, _) => Refresh();
         Grid.SelectionChanged += (_, _) => ShowDetails(Grid.SelectedItem as Unit);
-        Copy.Attach(Grid, o => o is Unit u ? (u.Title, u.Path) : null);
+        Copy.Attach(Grid, o => o is Unit u ? (u.Title, u.Path, u.Origin) : null);
         ScanButton.Click += (_, _) => _ = Model.I.ScanAsync();
         RecommendButton.Click += (_, _) => Model.I.MarkRecommended(view.Cast<Unit>());
         RecheckButton.Click += (_, _) => Model.I.RecheckOwners();
@@ -90,6 +90,8 @@ public partial class FindingsPage
         var lines = new List<string>();
         if (u.LastUsed is { } t) lines.Add(string.Format(Loc.T("Details.Used"), t.ToLocalTime().ToString("d", System.Globalization.CultureInfo.CurrentUICulture), u.SourceText));
         if (u.Marker is not null) lines.Add(string.Format(Loc.T("Details.Marker"), u.Marker));
+        if (u.Origin is not null) lines.Add(string.Format(Loc.T("Details.Origin"), u.Origin));
+        else if (u.OriginUnknown) lines.Add(Loc.T("Rebuild.UnknownTip"));
         lines.AddRange(u.Notes);
         if (u.Status == UnitStatus.OwnerRunning) lines.Add(string.Format(Loc.T("Details.CloseOwner"), u.Owner));
         else if (u.Status == UnitStatus.InUse) lines.Add(string.Format(Loc.T("Details.InUse"), u.Owner));

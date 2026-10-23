@@ -67,7 +67,7 @@ public static partial class OllamaScanner
             var freed = parts.Sum(p => p.Bytes);
             units.Add(new Unit
             {
-                Id = $"{l.Id}|{name}", Location = l.Id, Category = l.Category, Title = name, Root = models, Path = manifests[0].File,
+                Id = $"{l.Id}|{name}", Location = l.Id, Category = l.Category, Title = name, Root = models, Path = manifests[0].File, Origin = "ollama pull " + name,
                 Parts = parts, Bytes = freed, LastUsed = at, Source = source, Owners = l.Owners, Rebuild = l.Rebuild,
                 Notes = [string.Format(Loc.T("Note.OllamaShared"), Format.Size(freed), Format.Size(shared))],
             });

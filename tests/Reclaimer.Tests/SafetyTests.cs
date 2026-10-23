@@ -363,6 +363,7 @@ public class SafetyTests
         var other = Path.Combine(Mk(@"src\lmstudio\pub\other"), "other.gguf");
         File.WriteAllBytes(other, bytes.Reverse().ToArray());                  // same size, different content: not a duplicate
 
+        var minBytes = Dupes.MinBytes;
         Dupes.MinBytes = 1024;
         try
         {
@@ -391,7 +392,7 @@ public class SafetyTests
             CollectionAssert.AreEqual(bytes, File.ReadAllBytes(gguf));
             CollectionAssert.AreEqual(bytes, File.ReadAllBytes(blob));
         }
-        finally { Dupes.MinBytes = 1L << 30; }
+        finally { Dupes.MinBytes = minBytes; }
     }
 
     [TestMethod]

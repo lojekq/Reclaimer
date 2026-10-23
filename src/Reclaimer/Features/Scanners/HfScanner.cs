@@ -42,6 +42,7 @@ public static class HfScanner
             {
                 Id = $"{l.Id}|{repo}", Location = l.Id, Category = l.Category, Title = Path.GetFileName(repo), Root = hub,
                 Parts = parts, Bytes = parts.Sum(p => p.Bytes), LastUsed = at, Source = source, Owners = l.Owners, Rebuild = l.Rebuild, Notes = notes,
+                Origin = Origin.Hf(repo),
             });
             if (Detached(hub, repo, l) is { } d) units.Add(d);
         }
@@ -95,6 +96,7 @@ public static class HfScanner
         {
             Id = $"{l.Id}|detached|{repo}", Location = l.Id, Category = l.Category, Title = string.Format(Loc.T("Title.HfDetached"), Path.GetFileName(repo), old.Count),
             Root = hub, Path = snapsDir, Parts = parts, Bytes = parts.Sum(p => p.Bytes), LastUsed = at, Source = source, Owners = l.Owners, Rebuild = "Rebuild.Download",
+            Origin = Origin.Hf(repo),
         };
     }
 

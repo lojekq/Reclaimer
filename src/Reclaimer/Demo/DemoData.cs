@@ -72,12 +72,12 @@ public static class DemoData
     {
         var l = Catalog.All.ToDictionary(x => x.Id);
         Unit U(string loc, Category c, string title, string path, double gb, int days, UsedSource src, string? rebuild = null, string? marker = null,
-            UnitStatus status = UnitStatus.Ready, string? owner = null, string[]? notes = null, bool approx = false, string? dedupe = null) => new()
+            UnitStatus status = UnitStatus.Ready, string? owner = null, string[]? notes = null, bool approx = false, string? dedupe = null, string? origin = null) => new()
         {
             Id = "demo|" + path, Location = loc, Category = c, Title = title, Root = Home, Path = path,
             Parts = [new(path, true, (long)(gb * GB))], Bytes = (long)(gb * GB), LastUsed = DateTime.UtcNow.AddDays(-days).AddHours(-3), Source = src,
             Rebuild = rebuild ?? (l.TryGetValue(loc, out var x) ? x.Rebuild : null), Marker = marker, Status = status, Owner = owner,
-            Notes = [.. notes ?? []], Approximate = approx, DedupeOf = dedupe,
+            Notes = [.. notes ?? []], Approximate = approx, DedupeOf = dedupe, Origin = origin ?? DemoOrigin(loc, title, path),
         };
         var p = Home + @"\source";
         return
@@ -91,13 +91,17 @@ public static class DemoData
                 Home + @"\.lmstudio\models\lmstudio-community\gemma-3-12b-it-GGUF\gemma-3-12b-it-Q4_K_M.gguf", 7.3, 61, UsedSource.Modified, "Rebuild.Hardlink",
                 notes: [string.Format(Loc.T("Note.Dupe"), Home + @"\.ollama\modelslobs\sha256-adca500f")], dedupe: Home + @"\.ollama\modelslobs\sha256-adca500f"),
             U("own-models", Category.OwnModels, "Qwen3-27B-Q4_K_M.gguf", @"D:\llm\models\Qwen3-27B-Q4_K_M.gguf", 15.9, 9, UsedSource.Accessed, "Rebuild.Download",
-                status: UnitStatus.InUse, owner: "llama-server", notes: [string.Format(Loc.T("Note.OwnFolder"), @"D:\llm\models")]),
+                status: UnitStatus.InUse, owner: "llama-server", notes: [string.Format(Loc.T("Note.OwnFolder"), @"D:\llm\models")], origin: "https://huggingface.co/Qwen/Qwen3-27B-GGUF"),
             U("own-models", Category.OwnModels, "Qwen3-8B-Q8_0.gguf", @"D:\llm\models\old\Qwen3-8B-Q8_0.gguf", 8.7, 140, UsedSource.Modified, "Rebuild.Download",
                 notes: [string.Format(Loc.T("Note.OwnFolder"), @"D:\llm\models\old")]),
             U("own-models", Category.OwnModels, "gemma-3-12b-it-Q4_K_M.gguf", @"D:\llm\models\gemma-3-12b-it-Q4_K_M.gguf", 6.9, 58, UsedSource.Accessed, "Rebuild.Download",
-                status: UnitStatus.InUse, owner: "autostart.ps1 (MLink)", notes: [string.Format(Loc.T("Note.OwnFolder"), @"D:\llm\models")]),
+                status: UnitStatus.InUse, owner: "autostart.ps1 (MLink)", notes: [string.Format(Loc.T("Note.OwnFolder"), @"D:\llm\models")], origin: "https://huggingface.co/google/gemma-3-12b-it-GGUF"),
             U("ollama", Category.Models, "mistral-nemo:12b", Home + @"\.ollama\models\manifests\registry.ollama.ai\library\mistral-nemo\12b", 7.1, 41, UsedSource.Accessed),
-            U("models-custom", Category.Models, "sd_xl_base_1.0.safetensors", @"D:\ComfyUI\models\checkpoints\sd_xl_base_1.0.safetensors", 5.4, 210, UsedSource.Modified, "Rebuild.Download"),
+            U("models-custom", Category.Models, "sd_xl_base_1.0.safetensors", @"D:\ComfyUI\models\checkpoints\sd_xl_base_1.0.safetensors", 5.4, 210, UsedSource.Modified, "Rebuild.Download",
+                origin: "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0"),
+            U("models-custom", Category.Models, "my-vae-mix.safetensors", @"D:\ComfyUI\models\vae\my-vae-mix.safetensors", 0.32, 130, UsedSource.Modified, "Rebuild.Download"),
+            U("models-custom", Category.Models, "anime-style-v2.safetensors", @"D:\ComfyUI\models\loras\anime-style-v2.safetensors", 0.21, 77, UsedSource.Modified, "Rebuild.Download",
+                origin: "https://civitai.com/models/123456?modelVersionId=234567"),
             U("uv", Category.Caches, Loc.T("Title.uv"), Home + @"\AppData\Local\uv\cache", 6.1, 112, UsedSource.Modified, notes: [Loc.T("Note.Hardlinks")], approx: true),
             U("nuget", Category.Caches, Loc.T("Title.nuget"), Home + @"\.nuget\packages", 4.7, 1, UsedSource.Modified),
             U("pnpm", Category.Caches, Loc.T("Title.pnpm"), Home + @"\AppData\Local\pnpm\store", 3.5, 64, UsedSource.Modified, notes: [Loc.T("Note.Hardlinks")], approx: true),
@@ -116,6 +120,15 @@ public static class DemoData
                 status: UnitStatus.NotIgnored),
         ];
     }
+
+    /// <summary>What the real scanners would find for the demo paths; own folders stay unknown unless the row says otherwise.</summary>
+    static string? DemoOrigin(string loc, string title, string path) => loc switch
+    {
+        "hf-hub" => Origin.Hf(path),
+        "ollama" => "ollama pull " + title,
+        "lmstudio" => Origin.LmStudio(Home + @"\.lmstudio\models", path),
+        _ => null,
+    };
 
     static IEnumerable<Disk> Disks() =>
     [

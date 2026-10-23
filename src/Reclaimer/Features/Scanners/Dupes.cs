@@ -13,7 +13,7 @@ namespace Reclaimer.Features;
 /// </summary>
 public static class Dupes
 {
-    internal static long MinBytes = 1L << 30;
+    internal static long MinBytes = 100L << 20; // hashed only on a size match between programs, so the lower bar costs little
 
     /// <summary>A weights file of a program; Sha is known for content-addressed stores, null otherwise.</summary>
     public sealed record Copy(string Program, string Path, long Bytes, string? Sha, string Root, string[] Owners, bool InUse = false, Func<string?>? Holder = null);

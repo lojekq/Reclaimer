@@ -64,7 +64,13 @@ public sealed class Unit : INotifyPropertyChanged
     public string UsedText => Format.Ago(LastUsed);
     public string SourceText => Loc.T("Source." + Source);
     public string StatusText => Model.Reason("Status." + Status, this);
+    /// <summary>Where it can be downloaded again: a page or file URL, or "ollama pull name". Null = nobody knows (Origin).</summary>
+    public string? Origin { get; init; }
+    public bool OriginUnknown => Rebuild == "Rebuild.Download" && Origin is null;
     public string RebuildText => Rebuild is null ? "" : Loc.T(Rebuild);
+    /// <summary>The caption under "Download again": the site, or "Source unknown".</summary>
+    public string RebuildSub => Rebuild != "Rebuild.Download" ? "" : Origin is null ? Loc.T("Rebuild.Unknown") : Features.Origin.Site(Origin);
+    public string RebuildTip => OriginUnknown ? Loc.T("Rebuild.UnknownTip") : Origin ?? RebuildText;
     public string CategoryText => Loc.T("Category." + Category);
 
     public override string ToString() => Title; // screen readers and UI Automation name the row by it

@@ -87,6 +87,7 @@ public static class Dialog
         var models = units.Where(u => u.Category is Category.Models or Category.OwnModels && u.DedupeOf is null).ToList();
         if (models.Count > 0) body.Children.Add(Warning(string.Format(Loc.T("Confirm.WarnModels"), Format.Size(models.Sum(u => u.Bytes)))));
         if (units.Count(u => u.DedupeOf is not null) is var dupes and > 0) body.Children.Add(Warning(string.Format(Loc.T("Confirm.WarnDupes"), dupes)));
+        if (units.Count(u => u.OriginUnknown) is var unknown and > 0) body.Children.Add(Warning(string.Format(Loc.T("Confirm.WarnUnknown"), unknown)));
         if (units.Any(u => u.Approximate)) body.Children.Add(Warning(Loc.T("Note.Hardlinks")));
         body.Children.Add(Warning(string.Format(Loc.T("Confirm.WarnSpace"), Format.Date(DateTime.UtcNow.AddDays(days)))));
 

@@ -7,7 +7,8 @@ param([switch]$Reset)
 $ErrorActionPreference = 'Stop'; $PSNativeCommandUseErrorActionPreference = $true
 $S = 'C:\Demo\reclaimer-sandbox'
 if ($Reset -and (Test-Path $S)) {
-  if ((Get-Process Reclaimer -ErrorAction Ignore)) { throw 'close Reclaimer first' }
+  # only a dev instance uses the sandbox; the installed copy (%LOCALAPPDATA%\Programs\Reclaimer) never does and may keep running
+  if ((Get-Process Reclaimer -ErrorAction Ignore | Where-Object { $_.Path -notlike "$env:LOCALAPPDATA\Programs\Reclaimer\*" })) { throw 'close the Debug Reclaimer first' }
   Remove-Item -LiteralPath $S -Recurse -Force    # only this folder; there are no links inside to follow
 }
 if (Test-Path $S) { Write-Host "$S exists (use -Reset to rebuild)"; return }
@@ -81,6 +82,10 @@ Copy-Item $dup (Join-Path $S "ollama\models\blobs\sha256-$h")
 Copy-Item $dup (Join-Path (Folder 'projects\llm-lab\models') 'tiny-q4.gguf')
 Big 'projects\llm-lab\models\other-q8.gguf' 1100 | Out-Null
 Old (Join-Path $S 'projects\llm-lab') 200
+
+# v1.1 sources: a Civitai description next to the checkpoint, llama.cpp's sidecar next to other-q8; same-weights and tiny-q4 have none
+Text 'models\checkpoints\demo-sd15.civitai.info' '{"id":888,"modelId":777,"name":"v1.0","files":[{"downloadUrl":"https://civitai.com/api/download/models/888"}]}' | Out-Null
+Text 'projects\llm-lab\models\other-q8.gguf.json' '{"url":"https://huggingface.co/demo/other/resolve/main/other-q8.gguf?download=true","etag":"x"}' | Out-Null
 
 # Projects in git (dates of the past via GIT_*_DATE)
 function Repo($name, [int]$days, [string]$ignore) {

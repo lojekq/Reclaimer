@@ -100,7 +100,23 @@
                 <DataGridTemplateColumn Header="{l:T Findings.Rebuild}" Width="*" MinWidth="110">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="{x:Type f:Unit}">
-                            <ui:TextBlock Text="{Binding RebuildText}" VerticalAlignment="Center" Appearance="Secondary" TextTrimming="CharacterEllipsis" ToolTip="{Binding RebuildText}" />
+                            <Grid VerticalAlignment="Center" ToolTip="{Binding RebuildTip}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <ui:SymbolIcon x:Name="W" Symbol="Warning24" Foreground="{DynamicResource SystemFillColorCautionBrush}" Margin="0,0,6,0" Visibility="Collapsed" />
+                                <StackPanel Grid.Column="1">
+                                    <ui:TextBlock Text="{Binding RebuildText}" Appearance="Secondary" TextTrimming="CharacterEllipsis" />
+                                    <ui:TextBlock x:Name="R" Text="{Binding RebuildSub}" FontTypography="Caption" Appearance="Tertiary" TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                            </Grid>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding OriginUnknown}" Value="True">
+                                    <Setter TargetName="W" Property="Visibility" Value="Visible" />
+                                    <Setter TargetName="R" Property="Foreground" Value="{DynamicResource SystemFillColorCautionBrush}" />
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

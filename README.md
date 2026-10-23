@@ -58,6 +58,9 @@ An Ollama model is its manifest plus the layers no other model uses; a Hugging F
 The space comes back when the quarantine is cleaned: by itself after 7 days (1–30 in Settings), or now with **Delete now**.
 "Last used" is the last commit for projects, otherwise the newest file date. NTFS can also record when a file was last opened; Reclaimer uses that only when it is turned on (`NtfsDisableLastAccessUpdate`). When it can't tell, it says "unknown".
 
+The **Comes back** column says how an item returns: a cache is refilled by its tool, a build folder by the next build, a model is downloaded again from the source Reclaimer knows: the Hugging Face repo, `ollama pull`, LM Studio's publisher folder, a Civitai or llama.cpp description file next to the model, or the browser's download record. The full address is in the tooltip and in **Copy source**.
+A model with no known source shows **Source unknown** with a warning: it may have been trained at home or removed from the site, so make sure it can be downloaded again before moving it. Such files are never picked by **Mark recommended**, and the confirmation counts them.
+
 ## Download
 
 1. **[Download Reclaimer.exe](https://github.com/lojekq/Reclaimer/releases/latest/download/Reclaimer.exe)** (latest release). One file, no admin rights.
@@ -133,6 +136,11 @@ The kept copy is the one in Ollama or Hugging Face: they never edit a blob in pl
 <details><summary>The Docker buttons</summary>
 
 `docker builder prune -f` and `docker image prune -f` (dangling images only) delete for good, without the quarantine; the buttons and the confirmation say so. Volumes and `system prune -a` are never touched.
+</details>
+
+<details><summary>What does "Source unknown" mean?</summary>
+
+Nothing on disk says where the file came from: no Hugging Face or Ollama layout, no `.civitai.info` or `.metadata.json` next to it, no download record from the browser. It may be a LoRA you trained yourself or a file that is gone from its site. Reclaimer still moves it if you ask, but it cannot promise it can be downloaded again; **Restore** brings it back from the quarantine like anything else.
 </details>
 
 <details><summary>Controlled folder access blocked the move</summary>

@@ -47,6 +47,12 @@ public class SandboxTests
         var own = units.Where(u => u.Category == Category.OwnModels).ToList();
         CollectionAssert.AreEquivalent(new[] { "tiny-q4.gguf", "other-q8.gguf" }, own.Select(u => u.Title).ToList());
         Assert.IsTrue(own.All(u => u.Status == UnitStatus.Ready), string.Join(", ", own.Select(u => $"{u.Title}: {u.Status} {u.Owner}")));
+        // v1.1 sources
+        Assert.AreEqual("https://huggingface.co/demo/tiny-llama", t["models--demo--tiny-llama"].Origin);
+        Assert.AreEqual("ollama pull tinyllama:latest", t["tinyllama:latest"].Origin);
+        Assert.AreEqual("https://civitai.com/models/777?modelVersionId=888", t["demo-sd15.safetensors"].Origin);
+        Assert.AreEqual("https://huggingface.co/demo/other/resolve/main/other-q8.gguf", t["other-q8.gguf"].Origin);
+        Assert.IsTrue(t["same-weights.safetensors"].OriginUnknown);
         Assert.IsTrue(units.All(u => u.Parts.All(p => p.Path.StartsWith(Quarantine.SandboxDir, StringComparison.OrdinalIgnoreCase) || u.Location == "lmstudio")));
     }
 }

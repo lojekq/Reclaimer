@@ -15,9 +15,9 @@ public static class Report
         foreach (var g in units.GroupBy(u => u.Category).OrderBy(g => g.Key))
         {
             sb.Append($"## {Loc.T("Category." + g.Key)} · {Format.Size(g.Sum(u => u.Bytes))}\n\n");
-            sb.Append($"| {Loc.T("Findings.Name")} | {Loc.T("Report.Path")} | {Loc.T("Findings.Size")} | {Loc.T("Findings.Used")} | {Loc.T("Findings.Status")} |\n|---|---|---:|---|---|\n");
+            sb.Append($"| {Loc.T("Findings.Name")} | {Loc.T("Report.Path")} | {Loc.T("Findings.Size")} | {Loc.T("Findings.Used")} | {Loc.T("Findings.Status")} | {Loc.T("Findings.Rebuild")} |\n|---|---|---:|---|---|---|\n");
             foreach (var u in g.OrderByDescending(u => u.Bytes))
-                sb.Append($"| {Cell(u.Title)} | `{Cell(u.Path)}` | {u.SizeText} | {u.UsedText} ({u.SourceText}) | {Cell(u.StatusText)} |\n");
+                sb.Append($"| {Cell(u.Title)} | `{Cell(u.Path)}` | {u.SizeText} | {u.UsedText} ({u.SourceText}) | {Cell(u.StatusText)} | {Cell(u.RebuildText)}{(u.Origin is not null ? $" ({Cell(u.Origin)})" : u.OriginUnknown ? $" ({Loc.T("Rebuild.Unknown")})" : "")} |\n");
             sb.Append('\n');
         }
         if (disks.Count > 0)

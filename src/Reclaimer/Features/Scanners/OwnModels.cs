@@ -13,7 +13,7 @@ namespace Reclaimer.Features;
 public static class OwnModels
 {
     static readonly HashSet<string> Exts = new([".gguf", ".safetensors"], StringComparer.OrdinalIgnoreCase);
-    internal static long MinBytes = 1L << 30;
+    internal static long MinBytes = 100L << 20; // LoRAs and VAEs are 100 MB and more; the duplicate search uses the same bar
 
     public static bool IsWeights(FileInfo f) => Exts.Contains(f.Extension) && f.Length >= MinBytes;
 
@@ -25,7 +25,7 @@ public static class OwnModels
         {
             Id = $"own|{path}", Location = "own-models", Category = Category.OwnModels, Title = f.Name, Root = root,
             Parts = [new(path, false, f.Length, f.LastWriteTimeUtc)], Bytes = f.Length, LastUsed = at, Source = source,
-            Rebuild = "Rebuild.Download", Notes = [string.Format(Loc.T("Note.OwnFolder"), f.DirectoryName)],
+            Rebuild = "Rebuild.Download", Origin = Origin.OfFile(path), Notes = [string.Format(Loc.T("Note.OwnFolder"), f.DirectoryName)],
             Holder = () => Holders.Current().Of(path),
         };
     }

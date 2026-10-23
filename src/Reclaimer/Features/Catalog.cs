@@ -28,7 +28,7 @@ public static class Catalog
         new("cargo-cache", Category.Caches, Kind.Whole, [@"%USERPROFILE%\.cargo\registry\cache"], [("CARGO_HOME", @"registry\cache")], ["cargo", "rustc"], "Rebuild.Cache"),
         new("cargo-src", Category.Caches, Kind.Whole, [@"%USERPROFILE%\.cargo\registry\src"], [("CARGO_HOME", @"registry\src")], ["cargo", "rustc"], "Rebuild.Cache"),
         // Catalog+ (v1.0). No owner for Gradle (its daemon is a plain java.exe) or Go ("go" would match half the process list): file locks guard them
-        new("torch-hub", Category.Models, Kind.Whole, [@"%USERPROFILE%\.cache\torch\hub"], [("TORCH_HOME", "hub")], [], "Rebuild.Download"),
+        new("torch-hub", Category.Models, Kind.Whole, [@"%USERPROFILE%\.cache\torch\hub"], [("TORCH_HOME", "hub")], [], "Rebuild.Cache"), // the code that uses it downloads again
         new("llama-cpp", Category.Models, Kind.ModelFiles, [@"%LOCALAPPDATA%\llama.cpp"], [("LLAMA_CACHE", "")], ["llama-server", "llama-cli"], "Rebuild.Download"),
         new("gradle", Category.Caches, Kind.Whole, [@"%USERPROFILE%\.gradle\caches"], [("GRADLE_USER_HOME", "caches")], [], "Rebuild.Cache"),
         new("maven", Category.Caches, Kind.Whole, [@"%USERPROFILE%\.m2\repository"], [], [], "Rebuild.Cache"),
