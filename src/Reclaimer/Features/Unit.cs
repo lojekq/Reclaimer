@@ -4,12 +4,12 @@ using Reclaimer.Shell;
 
 namespace Reclaimer.Features;
 
-public enum Category { Models, Caches, Projects, Disks }
+public enum Category { Models, OwnModels, Caches, Projects, Disks }
 
 /// <summary>How "last used" is known: last commit, newest mtime, newest atime (only when NTFS writes it), Ollama's log, or not at all.</summary>
 public enum UsedSource { Unknown, Commit, Modified, Accessed, Ran }
 
-public enum UnitStatus { Ready, OwnerRunning, FilesBusy, NotIgnored, CloudFolder, NoQuarantine, ReportOnly }
+public enum UnitStatus { Ready, OwnerRunning, InUse, FilesBusy, NotIgnored, CloudFolder, NoQuarantine, ReportOnly }
 
 /// <summary>One path of a unit. Mtime is the path's own LastWriteTimeUtc at scan time: a change before the move = skip.</summary>
 public sealed record Part(string Path, bool IsDir, long Bytes, DateTime MtimeUtc = default);
@@ -30,6 +30,7 @@ public sealed class Unit : INotifyPropertyChanged
     public DateTime? LastUsed { get; init; }            // UTC
     public UsedSource Source { get; init; }
     public string[] Owners { get; init; } = [];          // process name prefixes that block the move
+    public Func<string?>? Holder { get; init; }         // v1.0 own models: who holds the file now (process, launcher script), null = free
     public string? Rebuild { get; init; }               // Loc key: how it comes back
     public string? DedupeOf { get; init; }              // v1.0 duplicate: after the move a hardlink to this kept file takes the part's place
     public DateTime KeepMtimeUtc { get; init; }         // the kept file must not change between the scan and the move

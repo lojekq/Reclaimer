@@ -36,7 +36,9 @@ public static class Scan
         var s = Settings.Current;
         foreach (var dir in s.ModelDirs.Where(Directory.Exists)) jobs.Add(("models-custom", () => Source(CustomModels, dir, ollamaUp, ct)));
         foreach (var dir in s.ExtraCacheDirs.Where(Directory.Exists)) jobs.Add(("cache-custom", () => Source(CustomCache, dir, ollamaUp, ct)));
-        foreach (var dir in s.ProjectRoots.Where(Directory.Exists)) jobs.Add(("projects", () => ProjectScanner.Scan(dir, ct)));
+        var known = KnownDirs();
+        foreach (var dir in s.ProjectRoots.Where(Directory.Exists)) jobs.Add(("projects", () => ProjectScanner.Scan(dir, known, ct)));
+        var own = new List<Unit>(); // weights in the user's own folders: they join the duplicate search below
 
         await Parallel.ForEachAsync(jobs, new ParallelOptions { MaxDegreeOfParallelism = 4, CancellationToken = ct }, (job, _) =>
         {
@@ -44,7 +46,11 @@ public static class Scan
             try
             {
                 foreach (var u in job.Run())
-                    if (Finish(u, names)) found(u);
+                    if (Finish(u, names))
+                    {
+                        found(u);
+                        if (u.Category == Category.OwnModels) lock (own) own.Add(u);
+                    }
             }
             catch (Exception e) when (e is not OperationCanceledException) { Log.Warn($"scan {job.Name} failed: {Fs.Describe(e)}"); }
             return ValueTask.CompletedTask;
@@ -52,7 +58,7 @@ public static class Scan
         step("duplicates");
         try
         {
-            foreach (var u in Dupes.Find(Dupes.Collect(), ct))
+            foreach (var u in Dupes.Find(Dupes.Collect().Concat(own.Select(Dupes.CopyOf)), ct))
                 if (Finish(u, names)) found(u);
         }
         catch (Exception e) when (e is not OperationCanceledException) { Log.Warn($"scan duplicates failed: {Fs.Describe(e)}"); }
@@ -87,7 +93,18 @@ public static class Scan
         if (u.Parts.Any(p => PathGuard.IsCloud(p.Path))) u.Status = UnitStatus.CloudFolder;
         else if (!FixedVolume(u.Parts[0].Path)) u.Status = UnitStatus.NoQuarantine;
         else if (OwnerCheck.Running(u.Owners, names) is { } o) (u.Status, u.Owner) = (UnitStatus.OwnerRunning, o);
+        else if (u.Holder?.Invoke() is { } h) (u.Status, u.Owner) = (UnitStatus.InUse, h);
         return true;
+    }
+
+    /// <summary>Folders other scanners own (catalog paths, model and cache folders, quarantines): the project walk never enters them.</summary>
+    static HashSet<string> KnownDirs()
+    {
+        var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var l in Catalog.All) foreach (var p in Catalog.PathsOf(l)) set.Add(p);
+        foreach (var p in Settings.Current.ModelDirs.Concat(Settings.Current.ExtraCacheDirs).Concat(Quarantine.KnownRoots()))
+            try { set.Add(Path.GetFullPath(p)); } catch (ArgumentException) { }
+        return set;
     }
 
     static bool FixedVolume(string path)

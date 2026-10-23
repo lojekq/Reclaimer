@@ -16,10 +16,14 @@ public static class Dupes
     internal static long MinBytes = 1L << 30;
 
     /// <summary>A weights file of a program; Sha is known for content-addressed stores, null otherwise.</summary>
-    public sealed record Copy(string Program, string Path, long Bytes, string? Sha, string Root, string[] Owners);
+    public sealed record Copy(string Program, string Path, long Bytes, string? Sha, string Root, string[] Owners, bool InUse = false, Func<string?>? Holder = null);
 
-    /// <summary>Content-addressed stores first: Ollama and HF never edit a blob in place, so they keep the data.</summary>
-    static int Rank(string program) => program switch { "Ollama" => 0, "Hugging Face" => 1, _ => 2 };
+    /// <summary>A copy in use stays where it is; then content-addressed stores: Ollama and HF never edit a blob in place, so they keep the data.</summary>
+    static int Rank(Copy c) => c.InUse ? -1 : c.Program switch { "Ollama" => 0, "Hugging Face" => 1, _ => 2 };
+
+    /// <summary>A weights file from the user's own folder (v1.0): its folder stands for the "program".</summary>
+    public static Copy CopyOf(Unit u) =>
+        new(Path.GetDirectoryName(u.Path)!, u.Path, u.Bytes, null, u.Root, [], u.Status == UnitStatus.InUse, u.Holder);
 
     public static List<Unit> Find(IEnumerable<Copy> copies, CancellationToken ct)
     {
@@ -32,8 +36,8 @@ public static class Dupes
             {
                 var list = same.ToList();
                 if (list.Select(c => c.Program).Distinct().Count() < 2) continue;
-                var keep = list.OrderBy(c => Rank(c.Program)).ThenBy(c => c.Path, StringComparer.OrdinalIgnoreCase).First();
-                foreach (var dup in list.Where(c => c.Program != keep.Program))
+                var keep = list.OrderBy(Rank).ThenBy(c => c.Path, StringComparer.OrdinalIgnoreCase).First();
+                foreach (var dup in list.Where(c => c.Program != keep.Program && !c.InUse))
                 {
                     if (Native.SameFile(dup.Path, keep.Path) || !SameVolume(dup.Path, keep.Path)) continue; // already linked, or no hardlink possible
                     units.Add(new Unit
@@ -42,7 +46,7 @@ public static class Dupes
                         Title = string.Format(Loc.T("Title.Dupe"), Path.GetFileName(dup.Path), dup.Program, keep.Program),
                         Parts = [new(dup.Path, false, dup.Bytes, File.GetLastWriteTimeUtc(dup.Path))], Bytes = dup.Bytes,
                         LastUsed = File.GetLastWriteTimeUtc(dup.Path), Source = UsedSource.Modified, Owners = dup.Owners, Rebuild = "Rebuild.Hardlink",
-                        DedupeOf = keep.Path, KeepMtimeUtc = File.GetLastWriteTimeUtc(keep.Path),
+                        DedupeOf = keep.Path, KeepMtimeUtc = File.GetLastWriteTimeUtc(keep.Path), Holder = dup.Holder,
                         Notes = [string.Format(Loc.T("Note.Dupe"), keep.Path)],
                     });
                 }

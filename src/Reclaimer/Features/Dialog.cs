@@ -84,7 +84,7 @@ public static class Dialog
         foreach (var (volume, root) in units.Select(u => RootOf(u)).Distinct())
             body.Children.Add(Text(string.Format(Loc.T("Confirm.Where"), volume, root), secondary: true));
 
-        var models = units.Where(u => u.Category == Category.Models && u.DedupeOf is null).ToList();
+        var models = units.Where(u => u.Category is Category.Models or Category.OwnModels && u.DedupeOf is null).ToList();
         if (models.Count > 0) body.Children.Add(Warning(string.Format(Loc.T("Confirm.WarnModels"), Format.Size(models.Sum(u => u.Bytes)))));
         if (units.Count(u => u.DedupeOf is not null) is var dupes and > 0) body.Children.Add(Warning(string.Format(Loc.T("Confirm.WarnDupes"), dupes)));
         if (units.Any(u => u.Approximate)) body.Children.Add(Warning(Loc.T("Note.Hardlinks")));

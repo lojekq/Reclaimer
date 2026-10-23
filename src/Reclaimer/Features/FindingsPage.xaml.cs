@@ -28,14 +28,15 @@ public partial class FindingsPage
         AgeBox.Value = AgeFilter;
         SizeBox.Value = Settings.Current.MinSizeMb;
         CategoryBox.Items.Add(Loc.T("Findings.All"));
-        foreach (var c in new[] { Category.Models, Category.Caches, Category.Projects }) CategoryBox.Items.Add(Loc.T("Category." + c));
-        CategoryBox.SelectedIndex = CategoryFilter is { } cf ? (int)cf + 1 : 0;
+        foreach (var c in Filters) CategoryBox.Items.Add(Loc.T("Category." + c));
+        CategoryBox.SelectedIndex = CategoryFilter is { } cf ? Array.IndexOf(Filters, cf) + 1 : 0;
         CategoryFilter = null;
 
         AgeBox.ValueChanged += (_, _) => { AgeFilter = AgeBox.Value ?? 0; Refresh(); };
         SizeBox.ValueChanged += (_, _) => Refresh();
         CategoryBox.SelectionChanged += (_, _) => Refresh();
         Grid.SelectionChanged += (_, _) => ShowDetails(Grid.SelectedItem as Unit);
+        Copy.Attach(Grid, o => o is Unit u ? (u.Title, u.Path) : null);
         ScanButton.Click += (_, _) => _ = Model.I.ScanAsync();
         RecommendButton.Click += (_, _) => Model.I.MarkRecommended(view.Cast<Unit>());
         RecheckButton.Click += (_, _) => Model.I.RecheckOwners();
@@ -54,13 +55,15 @@ public partial class FindingsPage
     /// <summary>The age filter survives page changes; 0 = off (the threshold for "Mark recommended" is in Settings).</summary>
     static double AgeFilter;
 
+    static readonly Category[] Filters = [Category.Models, Category.OwnModels, Category.Caches, Category.Projects];
+
     /// <summary>For the GIF scenario.</summary>
     public void SetAge(int days) => AgeBox.Value = days;
 
     bool Passes(Unit u) =>
         (AgeFilter <= 0 || u.AgeDays >= AgeFilter)
         && u.Bytes >= (SizeBox.Value ?? 0) * (1 << 20)
-        && (CategoryBox.SelectedIndex <= 0 || (int)u.Category == CategoryBox.SelectedIndex - 1);
+        && (CategoryBox.SelectedIndex <= 0 || u.Category == Filters[CategoryBox.SelectedIndex - 1]);
 
     void Refresh()
     {
@@ -89,6 +92,7 @@ public partial class FindingsPage
         if (u.Marker is not null) lines.Add(string.Format(Loc.T("Details.Marker"), u.Marker));
         lines.AddRange(u.Notes);
         if (u.Status == UnitStatus.OwnerRunning) lines.Add(string.Format(Loc.T("Details.CloseOwner"), u.Owner));
+        else if (u.Status == UnitStatus.InUse) lines.Add(string.Format(Loc.T("Details.InUse"), u.Owner));
         else if (!u.CanSelect) lines.Add(Loc.T("Details.Why." + u.Status));
         DetailText.Text = string.Join(" · ", lines);
     }

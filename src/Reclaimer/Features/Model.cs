@@ -172,7 +172,7 @@ public sealed class Model : INotifyPropertyChanged
         foreach (var u in Units.Where(u => u.Status is UnitStatus.OwnerRunning or UnitStatus.Ready))
         {
             var o = OwnerCheck.Running(u.Owners, names);
-            (u.Status, u.Owner) = o is null ? (UnitStatus.Ready, null) : (UnitStatus.OwnerRunning, o);
+            (u.Status, u.Owner) = o is not null ? (UnitStatus.OwnerRunning, o) : u.Holder?.Invoke() is { } h ? (UnitStatus.InUse, h) : (UnitStatus.Ready, null);
         }
     }
 
@@ -181,7 +181,7 @@ public sealed class Model : INotifyPropertyChanged
     {
         var age = Settings.Current.AgeDays;
         foreach (var u in visible)
-            u.Selected = u.Category != Category.Models && u.CanSelect && u.AgeDays >= age;
+            u.Selected = u.Category is not (Category.Models or Category.OwnModels) && u.CanSelect && u.AgeDays >= age;
     }
 
     // ------------------------------------------------------------ actions
@@ -376,7 +376,7 @@ public sealed class Model : INotifyPropertyChanged
         Tiles.Clear();
         foreach (var c in new[] { Category.Models, Category.Caches, Category.Projects })
         {
-            var units = Units.Where(u => u.Category == c && u.Status != UnitStatus.ReportOnly).ToList();
+            var units = Units.Where(u => TileOf(u.Category) == c && u.Status != UnitStatus.ReportOnly).ToList();
             Tiles.Add(new(c, Loc.T("Category." + c), Units.Count == 0 ? "—" : "≈ " + Format.Size(units.Sum(u => u.Bytes)), string.Format(Loc.T("Overview.Count"), units.Count)));
         }
         Tiles.Add(new(Category.Disks, Loc.T("Category.Disks"), Disks.Count == 0 ? "—" : Format.Size(Disks.Sum(d => d.Bytes)), string.Format(Loc.T("Overview.Report"), Disks.Count)));
@@ -384,7 +384,10 @@ public sealed class Model : INotifyPropertyChanged
 
     /// <summary>A reason key as text, with the owner's name where it needs one.</summary>
     public static string Reason(string key, Unit? u = null) =>
-        key == "Status.OwnerRunning" ? string.Format(Loc.T("Status.OwnerRunning"), u?.Owner) : Loc.T(key);
+        key is "Status.OwnerRunning" or "Status.InUse" ? string.Format(Loc.T(key), u?.Owner) : Loc.T(key);
+
+    /// <summary>Models in the user's own folders count in the "AI models" tile.</summary>
+    static Category TileOf(Category c) => c == Category.OwnModels ? Category.Models : c;
 
     static void OnUi(Action a) => Application.Current?.Dispatcher.BeginInvoke(a);
 

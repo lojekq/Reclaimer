@@ -12,7 +12,10 @@ public static class ProjectScanner
 {
     static readonly HashSet<string> NoDescend = new(["node_modules", "target", "bin", "obj", ".venv", "venv", ".next", ".git", ".reclaimer-quarantine"], StringComparer.OrdinalIgnoreCase);
 
-    public static List<Unit> Scan(string root, CancellationToken ct)
+    public static List<Unit> Scan(string root, CancellationToken ct) => Scan(root, new HashSet<string>(), ct);
+
+    /// <summary><paramref name="skip"/>: folders other scanners own (caches, model folders, quarantines); the walk never enters them.</summary>
+    public static List<Unit> Scan(string root, IReadOnlySet<string> skip, CancellationToken ct)
     {
         var units = new List<Unit>();
         var commits = new Dictionary<string, DateTime?>(StringComparer.OrdinalIgnoreCase);
@@ -22,15 +25,18 @@ public static class ProjectScanner
         {
             ct.ThrowIfCancellationRequested();
             var (dir, depth) = stack.Pop();
-            string[] subdirs;
-            try { subdirs = Directory.GetDirectories(dir, "*", Fs.Flat); } // Flat skips reparse points
+            FileSystemInfo[] entries;
+            try { entries = new DirectoryInfo(dir).GetFileSystemInfos("*", Fs.Flat); } // Flat skips reparse points
             catch (Exception e) when (e is IOException or UnauthorizedAccessException) { continue; }
+            var subdirs = entries.OfType<DirectoryInfo>().Select(d => d.FullName).ToArray();
             var names = subdirs.Select(Path.GetFileName).ToHashSet(StringComparer.OrdinalIgnoreCase);
             foreach (var (parts, marker, rebuild, owners) in Candidates(dir, names))
                 units.Add(Make(root, dir, parts, marker, rebuild, owners, commits));
+            foreach (var f in entries.OfType<FileInfo>())
+                if (OwnModels.IsWeights(f)) units.Add(OwnModels.Make(root, f)); // weights kept outside any known program (v1.0)
             if (depth >= 6) continue;
             foreach (var sub in subdirs)
-                if (!NoDescend.Contains(Path.GetFileName(sub)) && !PathGuard.Excluded().Any(x => Paths.IsUnder(x, sub)))
+                if (!NoDescend.Contains(Path.GetFileName(sub)) && !skip.Contains(sub) && !PathGuard.Excluded().Any(x => Paths.IsUnder(x, sub)))
                     stack.Push((sub, depth + 1));
         }
         return units;

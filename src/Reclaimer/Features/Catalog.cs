@@ -36,6 +36,12 @@ public static class Catalog
         new("yarn", Category.Caches, Kind.Whole, [@"%LOCALAPPDATA%\Yarn\Berry\cache"], [("YARN_CACHE_FOLDER", "")], [], "Rebuild.Cache"),
     ];
 
+    /// <summary>Known launchers (v1.0): folders with the scripts that start a program's models. A model they name is "in use" (Launchers).</summary>
+    public static readonly (string Tag, string[] Dirs)[] Launchers =
+    [
+        ("MLink", [@"%USERPROFILE%\MLink", @"%USERPROFILE%\MLink\MLinkV2\scripts"]),
+    ];
+
     /// <summary>Existing folders of a location: the first set variable wins, otherwise the defaults.</summary>
     public static List<string> PathsOf(Location l)
     {

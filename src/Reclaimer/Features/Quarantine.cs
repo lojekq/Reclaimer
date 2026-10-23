@@ -8,10 +8,11 @@ namespace Reclaimer.Features;
 public enum EntryState { Moving, Done, Restoring, Purging, Broken }
 
 /// <summary>A line of history.jsonl for the History page.</summary>
-public sealed record HistoryRow(DateTime Utc, string Action, string[] Paths, long Bytes, string Result, long Freed, string? Note = null)
+public sealed record HistoryRow(DateTime Utc, string Action, string[] Paths, long Bytes, string Result, long Freed, string? Note = null, string? Title = null)
 {
     public string WhenText => Utc.ToLocalTime().ToString("g", System.Globalization.CultureInfo.CurrentUICulture);
     public string ActionText => Action.StartsWith("docker") ? "Docker" : Loc.T("History." + Action);
+    public string NameText => Title ?? (Paths.Length > 0 ? Path.GetFileName(Paths[^1].TrimEnd('\\')) : Action); // lines before v1.0 carry no title
     public string PathText => Action.StartsWith("docker") ? Action : Paths.Length == 0 ? "" : Dialog.Short(Paths[^1]) + (Paths.Length > 1 ? "  " + string.Format(Loc.T("Confirm.Parts"), Paths.Length) : "");
     public string SizeText => Format.Size(Bytes);
     public string ResultText => Result switch
@@ -151,6 +152,11 @@ public static class Quarantine
         {
             (u.Status, u.Owner) = (UnitStatus.OwnerRunning, owner);
             return "Status.OwnerRunning";
+        }
+        if (u.Holder?.Invoke() is { } held) // own models: a process or a launcher script took it since the scan
+        {
+            (u.Status, u.Owner) = (UnitStatus.InUse, held);
+            return "Status.InUse";
         }
         var now = u.Parts.Sum(p => Fs.Size(p.Path));
         if (Math.Abs(now - u.Bytes) > u.Bytes / 10) return "Move.SizeChanged";
@@ -506,7 +512,8 @@ public static class Quarantine
                     rows.Add(new(r.GetProperty("ts").GetDateTime(), r.GetProperty("action").GetString() ?? "",
                         r.GetProperty("paths").EnumerateArray().Select(p => p.GetString() ?? "").ToArray(),
                         r.GetProperty("bytes").GetInt64(), r.GetProperty("result").GetString() ?? "", r.GetProperty("freedBytes").GetInt64(),
-                        r.TryGetProperty("note", out var n) && n.ValueKind == JsonValueKind.String ? n.GetString() : null));
+                        r.TryGetProperty("note", out var n) && n.ValueKind == JsonValueKind.String ? n.GetString() : null,
+                        r.TryGetProperty("title", out var t) && t.ValueKind == JsonValueKind.String ? t.GetString() : null));
                 }
                 catch (Exception e) when (e is JsonException or KeyNotFoundException or InvalidOperationException or FormatException) { }
         }
@@ -516,12 +523,12 @@ public static class Quarantine
 
     /// <summary>history.jsonl: a line per action. Local only; paths are fine here (they never go to the log, 00-shared §2.3).</summary>
     static void History(string action, Entry e, string result, long freed = 0) =>
-        History(action, e.Parts.Select(p => p.Original), e.TotalBytes, result, freed);
+        History(action, e.Parts.Select(p => p.Original), e.TotalBytes, result, freed, title: e.Title);
 
-    internal static void History(string action, IEnumerable<string> paths, long bytes, string result, long freed, string? note = null)
+    internal static void History(string action, IEnumerable<string> paths, long bytes, string result, long freed, string? note = null, string? title = null)
     {
         if (Args.Current.Demo) return;
-        var line = JsonSerializer.Serialize(new { ts = DateTime.UtcNow, action, paths, bytes, result, freedBytes = freed, note }, Line);
+        var line = JsonSerializer.Serialize(new { ts = DateTime.UtcNow, action, paths, bytes, result, freedBytes = freed, note, title }, Line);
         try
         {
             lock (HistoryLock)

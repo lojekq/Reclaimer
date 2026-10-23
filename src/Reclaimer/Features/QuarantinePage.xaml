@@ -18,45 +18,44 @@
         </Grid>
         <ui:TextBlock x:Name="Summary" Grid.Row="1" Appearance="Secondary" TextWrapping="Wrap" Margin="0,4,0,12" />
 
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{Binding Entries}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type f:Entry}">
-                        <ui:Card x:Name="C" Margin="0,0,0,6" Padding="16,10">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="110" />
-                                    <ColumnDefinition Width="130" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center" ToolTip="{Binding Original}" Margin="0,0,16,0">
-                                    <ui:TextBlock Text="{Binding Title}" FontTypography="BodyStrong" TextTrimming="CharacterEllipsis" />
-                                    <ui:TextBlock Text="{Binding Original}" FontTypography="Caption" Appearance="Tertiary" TextTrimming="CharacterEllipsis" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                    <ui:TextBlock Text="{Binding SizeText}" FontTypography="BodyStrong" />
-                                    <ui:TextBlock Text="{Binding WhenText}" FontTypography="Caption" Appearance="Tertiary" />
-                                </StackPanel>
-                                <ui:TextBlock x:Name="Left" Grid.Column="2" Text="{Binding LeftText}" VerticalAlignment="Center" TextWrapping="Wrap" />
-                                <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <ui:Button Content="{l:T Quarantine.Restore}" Icon="{ui:SymbolIcon ArrowUndo24}" Click="Restore_Click"
-                                               IsEnabled="{Binding CanAct}" Margin="0,0,8,0" />
-                                    <ui:Button Content="{l:T Quarantine.Delete}" Icon="{ui:SymbolIcon Delete24}" Click="Delete_Click" />
-                                </StackPanel>
-                            </Grid>
-                        </ui:Card>
-                        <DataTemplate.Triggers>
-                            <DataTrigger Binding="{Binding IsBroken}" Value="True">
-                                <Setter TargetName="C" Property="BorderBrush" Value="{DynamicResource SystemFillColorCriticalBrush}" />
-                                <Setter TargetName="C" Property="BorderThickness" Value="2" />
-                                <Setter TargetName="Left" Property="Foreground" Value="{DynamicResource SystemFillColorCriticalBrush}" />
-                            </DataTrigger>
-                        </DataTemplate.Triggers>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
+        <ListBox x:Name="List" Grid.Row="2" ItemsSource="{Binding Entries}" SelectionMode="Single" BorderThickness="0" Background="Transparent" HorizontalContentAlignment="Stretch"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="{x:Type f:Entry}">
+                    <ui:Card x:Name="C" Margin="0,0,0,6" Padding="16,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="110" />
+                                <ColumnDefinition Width="130" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" ToolTip="{Binding Original}" Margin="0,0,16,0">
+                                <ui:TextBlock Text="{Binding Title}" FontTypography="BodyStrong" TextTrimming="CharacterEllipsis" />
+                                <ui:TextBlock Text="{Binding Original}" FontTypography="Caption" Appearance="Tertiary" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <ui:TextBlock Text="{Binding SizeText}" FontTypography="BodyStrong" />
+                                <ui:TextBlock Text="{Binding WhenText}" FontTypography="Caption" Appearance="Tertiary" />
+                            </StackPanel>
+                            <ui:TextBlock x:Name="Left" Grid.Column="2" Text="{Binding LeftText}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                            <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                                <ui:Button Content="{l:T Quarantine.Restore}" Icon="{ui:SymbolIcon ArrowUndo24}" Click="Restore_Click"
+                                           IsEnabled="{Binding CanAct}" Margin="0,0,8,0" />
+                                <ui:Button Content="{l:T Quarantine.Delete}" Icon="{ui:SymbolIcon Delete24}" Click="Delete_Click" />
+                            </StackPanel>
+                        </Grid>
+                    </ui:Card>
+                    <DataTemplate.Triggers>
+                        <DataTrigger Binding="{Binding IsBroken}" Value="True">
+                            <Setter TargetName="C" Property="BorderBrush" Value="{DynamicResource SystemFillColorCriticalBrush}" />
+                            <Setter TargetName="C" Property="BorderThickness" Value="2" />
+                            <Setter TargetName="Left" Property="Foreground" Value="{DynamicResource SystemFillColorCriticalBrush}" />
+                        </DataTrigger>
+                    </DataTemplate.Triggers>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
         <ui:TextBlock x:Name="EmptyText" Grid.Row="2" Text="{l:T Quarantine.Empty}" Appearance="Tertiary" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" />
     </Grid>
 </Page>

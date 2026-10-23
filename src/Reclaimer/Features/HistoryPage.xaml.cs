@@ -9,6 +9,7 @@ public partial class HistoryPage
     {
         InitializeComponent();
         DataContext = Model.I;
+        Copy.Attach(List, o => o is HistoryRow r ? (r.NameText, string.Join(Environment.NewLine, r.Paths)) : null);
         Loaded += (_, _) =>
         {
             Model.I.RefreshHistory();

@@ -72,6 +72,64 @@ public class V1Tests
     }
 
     [TestMethod]
+    public void LaunchersExtractModelPathsFromScripts()
+    {
+        var d = Path.Combine(dir, "mlink");
+        Directory.CreateDirectory(d);
+        var bat = """
+            @echo off
+            setlocal
+            set "MODEL_DIR=D:\llm\models"
+            set "PREFIX=Qwen3-27B"
+            set "QUANT=%~1"
+            if "%QUANT%"=="" set "QUANT=Q2_K"
+            set "MODEL=%MODEL_DIR%\%PREFIX%-%QUANT%.gguf"
+            set "TEMPLATE=%~dp0scripts\chat.jinja"
+            start "" llama-server.exe -m "%MODEL%"
+            """;
+        var ps1 = """
+            $orca = 'D:\llm\orca'
+            $profiles = @{ Orca = @{ Model = "$orca\OrcaRouter-IQ3.gguf"; Mmproj = "${orca}\mmproj\mmproj-Q8.gguf" } }
+            $local = "$PSScriptRoot\local.safetensors"
+            """;
+        var json = """{ "model": "E:\\weights\\sd_xl.safetensors", "other": "x.gguf" }""";
+        CollectionAssert.AreEquivalent(new[] { @"D:\llm\models\Qwen3-27B-Q2_K.gguf" }, Launchers.Extract(bat, ".bat", d).ToList());
+        CollectionAssert.AreEquivalent(new[] { @"D:\llm\orca\OrcaRouter-IQ3.gguf", @"D:\llm\orca\mmproj\mmproj-Q8.gguf", Path.Combine(d, "local.safetensors") },
+            Launchers.Extract(ps1, ".ps1", d).ToList());
+        CollectionAssert.AreEquivalent(new[] { @"E:\weights\sd_xl.safetensors" }, Launchers.Extract(json, ".json", d).ToList());
+    }
+
+    [TestMethod]
+    public void OwnModelHeldByScriptProcessOrOpenHandle()
+    {
+        var uniq = Guid.NewGuid().ToString("N")[..8];
+        var free = Mk($@"models\free-{uniq}.gguf", "weights");
+        var scripted = Mk($@"models\scripted-{uniq}.gguf", "weights");
+        var opened = Mk($@"models\opened-{uniq}.gguf", "weights");
+        var byCmd = Mk($@"models\cmd-{uniq}.gguf", "weights");
+        Mk(@"launch\run.bat", $"set \"MODEL={scripted}\"\r\nllama-server -m \"%MODEL%\"\r\n");
+        var dirs = Launchers.Dirs;
+        Launchers.Dirs = () => [("test", Path.Combine(dir, "launch"))];
+        try
+        {
+            using var handle = new FileStream(opened, FileMode.Open, FileAccess.Read, FileShare.Read);
+            using var p = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("cmd.exe", $"/c ping -n 6 127.0.0.1 >nul & rem {byCmd}")
+                { CreateNoWindow = true, UseShellExecute = false })!;
+            try
+            {
+                Thread.Sleep(300);
+                var h = Holders.Snapshot();
+                Assert.IsNull(h.Of(free));
+                Assert.AreEqual("run.bat (test)", h.Of(scripted));
+                Assert.AreEqual("cmd", h.Of(byCmd));                             // llama-server -m <file>: the command line names it
+                Assert.IsNotNull(h.Of(opened));                                   // ComfyUI, LM Studio: an open handle
+            }
+            finally { p.Kill(entireProcessTree: true); }
+        }
+        finally { Launchers.Dirs = dirs; }
+    }
+
+    [TestMethod]
     public void DockerOutputIsParsed()
     {
         var rows = Docker.Parse("""

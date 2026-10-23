@@ -298,4 +298,13 @@
   <data name="Settings.Install" xml:space="preserve"><value>Установка</value></data>
   <data name="Settings.Installed" xml:space="preserve"><value>Установлена в {0}</value></data>
   <data name="Settings.NotInstalled" xml:space="preserve"><value>Работает без установки, из {0}</value></data>
+  <data name="Category.OwnModels" xml:space="preserve"><value>Модели в своих папках</value></data>
+  <data name="Status.InUse" xml:space="preserve"><value>Используется: {0}</value></data>
+  <data name="Details.InUse" xml:space="preserve"><value>Держит {0}: закрой эту программу или поправь скрипт запуска и нажми «Проверить снова»</value></data>
+  <data name="InUse.OpenFile" xml:space="preserve"><value>запущенная программа (файл открыт)</value></data>
+  <data name="Note.OwnFolder" xml:space="preserve"><value>В папке {0}</value></data>
+  <data name="Settings.Launchers" xml:space="preserve"><value>Папки скриптов запуска</value></data>
+  <data name="Settings.Launchers.Note" xml:space="preserve"><value>скрипты и конфиги, которые запускают твои модели (.bat, .ps1, .json…): упомянутая в них модель считается используемой</value></data>
+  <data name="Copy.Name" xml:space="preserve"><value>Копировать имя</value></data>
+  <data name="Copy.Path" xml:space="preserve"><value>Копировать путь</value></data>
 </root>

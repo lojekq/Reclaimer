@@ -13,35 +13,37 @@
         </Grid.RowDefinitions>
         <ui:TextBlock FontTypography="Title" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{l:T Page.History}" />
         <ui:TextBlock Grid.Row="1" Appearance="Secondary" Text="{l:T History.Subtitle}" TextWrapping="Wrap" Margin="0,4,0,12" />
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{Binding History}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type f:HistoryRow}">
-                        <Border Padding="12,8" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="150" />
-                                    <ColumnDefinition Width="110" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="100" />
-                                    <ColumnDefinition Width="160" />
-                                </Grid.ColumnDefinitions>
-                                <ui:TextBlock Text="{Binding WhenText}" Appearance="Secondary" VerticalAlignment="Center" />
-                                <ui:TextBlock Grid.Column="1" Text="{Binding ActionText}" FontTypography="BodyStrong" VerticalAlignment="Center" />
-                                <ui:TextBlock Grid.Column="2" Text="{Binding PathText}" ToolTip="{Binding PathText}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,12,0" />
-                                <ui:TextBlock Grid.Column="3" Text="{Binding SizeText}" VerticalAlignment="Center" />
-                                <ui:TextBlock x:Name="R" Grid.Column="4" Text="{Binding ResultText}" Appearance="Secondary" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
-                            </Grid>
-                        </Border>
-                        <DataTemplate.Triggers>
-                            <DataTrigger Binding="{Binding Failed}" Value="True">
-                                <Setter TargetName="R" Property="Foreground" Value="{DynamicResource SystemFillColorCautionBrush}" />
-                            </DataTrigger>
-                        </DataTemplate.Triggers>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
+        <ListBox x:Name="List" Grid.Row="2" ItemsSource="{Binding History}" SelectionMode="Single" BorderThickness="0" Background="Transparent" HorizontalContentAlignment="Stretch"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="{x:Type f:HistoryRow}">
+                    <Border Padding="8,6" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150" />
+                                <ColumnDefinition Width="110" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="160" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBlock Text="{Binding WhenText}" Appearance="Secondary" VerticalAlignment="Center" />
+                            <ui:TextBlock Grid.Column="1" Text="{Binding ActionText}" FontTypography="BodyStrong" VerticalAlignment="Center" />
+                            <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="0,0,12,0" ToolTip="{Binding PathText}">
+                                <ui:TextBlock Text="{Binding NameText}" TextTrimming="CharacterEllipsis" />
+                                <ui:TextBlock Text="{Binding PathText}" FontTypography="Caption" Appearance="Tertiary" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                            <ui:TextBlock Grid.Column="3" Text="{Binding SizeText}" VerticalAlignment="Center" />
+                            <ui:TextBlock x:Name="R" Grid.Column="4" Text="{Binding ResultText}" Appearance="Secondary" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+                    <DataTemplate.Triggers>
+                        <DataTrigger Binding="{Binding Failed}" Value="True">
+                            <Setter TargetName="R" Property="Foreground" Value="{DynamicResource SystemFillColorCautionBrush}" />
+                        </DataTrigger>
+                    </DataTemplate.Triggers>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
         <ui:TextBlock x:Name="EmptyText" Grid.Row="2" Text="{l:T History.Empty}" Appearance="Tertiary" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" />
     </Grid>
 </Page>

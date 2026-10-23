@@ -26,7 +26,7 @@ Generic cleaners don't know these places, and "biggest files" tools leave you gu
 
 ## Features
 
-- **Knows the places** — Hugging Face (old revisions and unfinished downloads too), Ollama, LM Studio, ComfyUI, llama.cpp, PyTorch hub, pip, uv, npm, pnpm, Yarn, NuGet, Cargo, Gradle, Maven and Go, plus folders you add.
+- **Knows the places** — Hugging Face (old revisions and unfinished downloads too), Ollama, LM Studio, ComfyUI, llama.cpp, PyTorch hub, pip, uv, npm, pnpm, Yarn, NuGet, Cargo, Gradle, Maven and Go, plus folders you add. Any `.gguf` or `.safetensors` of 1 GB and more in the folders you scan counts too; one a running program or a launcher script uses is marked "in use".
 - **Stale projects** — `node_modules`, `target`, `bin`/`obj`, `.venv`, `.next` in projects untouched for 90+ days, with the last commit date.
 - **Honest "last used"** — and how it knows: last commit, last Ollama run, modified, opened (only when NTFS records it), or "unknown".
 - **7-day undo, full history** — moved items wait in a quarantine on the same disk and come back with one click; History lists every action and the space it freed, and the findings export to Markdown.
@@ -84,6 +84,7 @@ Then add your project folders on the Overview page, press **Scan**, tick what yo
 | Model folders | none | ComfyUI `models`, GGUF folders: files of 100 MB and more |
 | Own cache folders | none | Moved as a whole: only folders a tool refills by itself |
 | Excluded folders | none | Never scanned or moved |
+| Launcher folders | none | Scripts and configs that start your models; a model they name is "in use" and can't be picked |
 | Weekly reminder | off | Once a week a quiet scan tells how much can be reclaimed, if it is 1 GB or more |
 | Start with Windows | on after install | Needed for the automatic cleanup of the quarantine |
 | Installation | — | Install, or Uninstall when installed |
@@ -112,9 +113,10 @@ A rename keeps the data on the same disk, which is what makes the undo instant. 
 For pnpm and uv some files may be hardlinks shared with projects, so the freed space can be smaller than shown; the number in the notification is measured on the disk.
 </details>
 
-<details><summary>A row says "Owner running" or "Files in use"</summary>
+<details><summary>A row says "Owner running", "In use" or "Files in use"</summary>
 
-Reclaimer doesn't close programs. Close Ollama, LM Studio, the build or whatever holds the files, then press **Check again**. A row "Not in .gitignore" is a folder git tracks: it may hold your own files, so it can't be picked.
+Reclaimer doesn't close programs. Close Ollama, LM Studio, the build or whatever holds the files, then press **Check again**.
+"In use" is a model in your own folders that a running program holds (llama-server started with `-m`, ComfyUI, LM Studio) or a launcher script names; MLink's scripts are read on their own, other launchers you add in Settings. Copy a row's name or path from its right-click menu (Ctrl+C copies the name). A row "Not in .gitignore" is a folder git tracks: it may hold your own files, so it can't be picked.
 </details>
 
 <details><summary>How does compacting a WSL or Docker disk work?</summary>
@@ -149,7 +151,7 @@ Without installing: About → **Remove data and autostart**, then delete the exe
 
 No telemetry. The only network request is the update check: `GET https://api.github.com/repos/lojekq/Reclaimer/releases/latest` once a day; turn it off in Settings.
 It runs `git.exe` (with `core.fsmonitor=false`) to ask whether a folder is ignored and when the last commit was, `wsl.exe --list --running` and `docker system df`; on your request also the Docker prunes, `fstrim`, `wsl --shutdown` and `diskpart`. All of it stays on this PC.
-It reads Ollama's `server*.log` to know when a model last ran.
+It reads Ollama's `server*.log` to know when a model last ran, and the launcher scripts in your MLink folder and the launcher folders you add (text only, to learn which models they start).
 `history.jsonl` keeps the paths of what was moved, restored and deleted on this PC. Logs contain no paths.
 
 ## Build from source

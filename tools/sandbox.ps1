@@ -77,6 +77,11 @@ $dup = Big 'models\checkpoints\same-weights.safetensors' 1024
 $h = (Get-FileHash $dup -Algorithm SHA256).Hash.ToLower()
 Copy-Item $dup (Join-Path $S "ollama\models\blobs\sha256-$h")
 
+# v1.0 models in own folders: weights inside a project root; tiny-q4 is the same 1 GB as the Ollama blob, other-q8 is unique
+Copy-Item $dup (Join-Path (Folder 'projects\llm-lab\models') 'tiny-q4.gguf')
+Big 'projects\llm-lab\models\other-q8.gguf' 1100 | Out-Null
+Old (Join-Path $S 'projects\llm-lab') 200
+
 # Projects in git (dates of the past via GIT_*_DATE)
 function Repo($name, [int]$days, [string]$ignore) {
   $d = Folder "projects\$name"

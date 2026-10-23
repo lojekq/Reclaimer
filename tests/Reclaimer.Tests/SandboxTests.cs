@@ -41,9 +41,12 @@ public class SandboxTests
         Assert.HasCount(1, units.Single(u => u.Id.Contains("|incomplete|")).Parts);
         foreach (var id in new[] { "torch-hub", "llama-cpp", "gradle", "go-mod", "yarn" })
             Assert.IsTrue(units.Any(u => u.Location == id), id);
-        var dupe = units.Single(u => u.Location == "dupe");
-        Assert.AreEqual("same-weights.safetensors", Path.GetFileName(dupe.Path));
-        StringAssert.Contains(dupe.DedupeOf!, @"ollama\models\blobs\sha256-");
+        var dupes = units.Where(u => u.Location == "dupe").ToList();
+        CollectionAssert.AreEquivalent(new[] { "same-weights.safetensors", "tiny-q4.gguf" }, dupes.Select(u => Path.GetFileName(u.Path)).ToList());
+        foreach (var d in dupes) StringAssert.Contains(d.DedupeOf!, @"ollama\models\blobs\sha256-"); // the content-addressed copy is kept
+        var own = units.Where(u => u.Category == Category.OwnModels).ToList();
+        CollectionAssert.AreEquivalent(new[] { "tiny-q4.gguf", "other-q8.gguf" }, own.Select(u => u.Title).ToList());
+        Assert.IsTrue(own.All(u => u.Status == UnitStatus.Ready), string.Join(", ", own.Select(u => $"{u.Title}: {u.Status} {u.Owner}")));
         Assert.IsTrue(units.All(u => u.Parts.All(p => p.Path.StartsWith(Quarantine.SandboxDir, StringComparison.OrdinalIgnoreCase) || u.Location == "lmstudio")));
     }
 }

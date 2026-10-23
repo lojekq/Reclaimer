@@ -26,6 +26,7 @@ public static class SettingsSection
         panel.Children.Add(new CardControl { Header = Loc.T("Settings.Remind"), Icon = new SymbolIcon(SymbolRegular.Alert24), Content = remind, Margin = new(0, 0, 0, 4) });
         panel.Children.Add(Folders("Settings.ModelDirs", SymbolRegular.BrainCircuit24, s.ModelDirs, "Settings.ModelDirs.Note"));
         panel.Children.Add(Folders("Settings.ExtraCaches", SymbolRegular.BoxMultiple24, s.ExtraCacheDirs, "Settings.ExtraCaches.Note"));
+        panel.Children.Add(Folders("Settings.Launchers", SymbolRegular.DocumentText24, s.LauncherDirs, "Settings.Launchers.Note"));
         panel.Children.Add(Folders("Settings.Excluded", SymbolRegular.ShieldProhibited24, s.Excluded, "Settings.Excluded.Note"));
         return panel;
     }

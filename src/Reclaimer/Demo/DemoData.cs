@@ -33,15 +33,15 @@ public static class DemoData
         var p = Home + @"\source";
         foreach (var h in new HistoryRow[]
         {
-            new(now.AddHours(-2), "restore", [p + @"\website\node_modules"], (long)(0.9 * GB), "ok", 0),
-            new(now.AddDays(-1).AddHours(-1), "move", [Home + @"\.cache\huggingface\hub\models--stabilityai--sdxl-turbo"], (long)(6.9 * GB), "ok", 0),
-            new(now.AddDays(-1).AddHours(-1), "move", [p + @"\cuda-sandbox\.venv"], (long)(2.8 * GB), "ok", 0),
-            new(now.AddDays(-2), "purge", [Home + @"\.ollama\models\blobs\sha256-3f9a", Home + @"\.ollama\models\manifests\registry.ollama.ai\library\phi3\mini"], (long)(2.2 * GB), "ok", (long)(2.2 * GB)),
-            new(now.AddDays(-4), "move", [Home + @"\AppData\Local\NuGet\v3-cache"], (long)(1.1 * GB), "ok", 0),
-            new(now.AddDays(-4), "move", [p + @"\website\node_modules"], (long)(0.9 * GB), "ok", 0),
-            new(now.AddDays(-6), "move", [p + @"\bot\bin", p + @"\bot\obj"], (long)(0.7 * GB), "ok", 0),
-            new(now.AddDays(-9), "purge", [Home + @"\AppData\Local\pip\Cache"], (long)(3.4 * GB), "ok", (long)(3.3 * GB)),
-            new(now.AddDays(-12), "move", [p + @"\game\target"], (long)(4.1 * GB), "error 32", 0),
+            new(now.AddHours(-2), "restore", [p + @"\website\node_modules"], (long)(0.9 * GB), "ok", 0, null, @"website\node_modules"),
+            new(now.AddDays(-1).AddHours(-1), "move", [Home + @"\.cache\huggingface\hub\models--stabilityai--sdxl-turbo"], (long)(6.9 * GB), "ok", 0, null, "models--stabilityai--sdxl-turbo"),
+            new(now.AddDays(-1).AddHours(-1), "move", [p + @"\cuda-sandbox\.venv"], (long)(2.8 * GB), "ok", 0, null, @"cuda-sandbox\.venv"),
+            new(now.AddDays(-2), "purge", [Home + @"\.ollama\models\blobs\sha256-3f9a", Home + @"\.ollama\models\manifests\registry.ollama.ai\library\phi3\mini"], (long)(2.2 * GB), "ok", (long)(2.2 * GB), null, "phi3:mini"),
+            new(now.AddDays(-4), "move", [Home + @"\AppData\Local\NuGet\v3-cache"], (long)(1.1 * GB), "ok", 0, null, Loc.T("Title.nuget-http")),
+            new(now.AddDays(-4), "move", [p + @"\website\node_modules"], (long)(0.9 * GB), "ok", 0, null, @"website\node_modules"),
+            new(now.AddDays(-6), "move", [p + @"\bot\bin", p + @"\bot\obj"], (long)(0.7 * GB), "ok", 0, null, @"bot\bin + obj"),
+            new(now.AddDays(-9), "purge", [Home + @"\AppData\Local\pip\Cache"], (long)(3.4 * GB), "ok", (long)(3.3 * GB), null, Loc.T("Title.pip")),
+            new(now.AddDays(-12), "move", [p + @"\game\target"], (long)(4.1 * GB), "error 32", 0, null, @"game\target"),
         })
             m.History.Add(h);
     }
@@ -90,6 +90,12 @@ public static class DemoData
             U("dupe", Category.Models, string.Format(Loc.T("Title.Dupe"), "gemma-3-12b-it-Q4_K_M.gguf", "LM Studio", "Ollama"),
                 Home + @"\.lmstudio\models\lmstudio-community\gemma-3-12b-it-GGUF\gemma-3-12b-it-Q4_K_M.gguf", 7.3, 61, UsedSource.Modified, "Rebuild.Hardlink",
                 notes: [string.Format(Loc.T("Note.Dupe"), Home + @"\.ollama\modelslobs\sha256-adca500f")], dedupe: Home + @"\.ollama\modelslobs\sha256-adca500f"),
+            U("own-models", Category.OwnModels, "Qwen3-27B-Q4_K_M.gguf", @"D:\llm\models\Qwen3-27B-Q4_K_M.gguf", 15.9, 9, UsedSource.Accessed, "Rebuild.Download",
+                status: UnitStatus.InUse, owner: "llama-server", notes: [string.Format(Loc.T("Note.OwnFolder"), @"D:\llm\models")]),
+            U("own-models", Category.OwnModels, "Qwen3-8B-Q8_0.gguf", @"D:\llm\models\old\Qwen3-8B-Q8_0.gguf", 8.7, 140, UsedSource.Modified, "Rebuild.Download",
+                notes: [string.Format(Loc.T("Note.OwnFolder"), @"D:\llm\models\old")]),
+            U("own-models", Category.OwnModels, "gemma-3-12b-it-Q4_K_M.gguf", @"D:\llm\models\gemma-3-12b-it-Q4_K_M.gguf", 6.9, 58, UsedSource.Accessed, "Rebuild.Download",
+                status: UnitStatus.InUse, owner: "autostart.ps1 (MLink)", notes: [string.Format(Loc.T("Note.OwnFolder"), @"D:\llm\models")]),
             U("ollama", Category.Models, "mistral-nemo:12b", Home + @"\.ollama\models\manifests\registry.ollama.ai\library\mistral-nemo\12b", 7.1, 41, UsedSource.Accessed),
             U("models-custom", Category.Models, "sd_xl_base_1.0.safetensors", @"D:\ComfyUI\models\checkpoints\sd_xl_base_1.0.safetensors", 5.4, 210, UsedSource.Modified, "Rebuild.Download"),
             U("uv", Category.Caches, Loc.T("Title.uv"), Home + @"\AppData\Local\uv\cache", 6.1, 112, UsedSource.Modified, notes: [Loc.T("Note.Hardlinks")], approx: true),
