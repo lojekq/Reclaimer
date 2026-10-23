@@ -165,6 +165,7 @@ dotnet test
 ```
 
 A Debug build only moves and deletes inside `C:\Demo\reclaimer-sandbox`; `pwsh tools/sandbox.ps1` creates it with placeholder files.
+A Debug build, the tests and a Release build started with `--data-dir <folder>` are dev instances: settings, history and quarantine live in `%APPDATA%\Reclaimer-dev` and `%LOCALAPPDATA%\Reclaimer-dev` (or in that folder), and they never meet the installed copy.
 
 ## License
 

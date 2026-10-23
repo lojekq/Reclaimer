@@ -27,7 +27,7 @@ public static class TrayMenu
         foreach (var i in QuarantineItems) i.Header = Header();
         // Shell's Tray keeps its TaskbarIcon private and the shell is frozen (00-shared §9.2): the tooltip is set through reflection
         if (typeof(Tray).GetField("icon", BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(null) is TaskbarIcon icon)
-            icon.ToolTipText = Model.I.QuarantineBytes > 0 ? string.Format(Loc.T("Tray.Tooltip"), AppInfo.DisplayName, Model.I.QuarantineText) : AppInfo.DisplayName;
+            icon.ToolTipText = Model.I.QuarantineBytes > 0 ? string.Format(Loc.T("Tray.Tooltip"), AppInfo.Title, Model.I.QuarantineText) : AppInfo.Title;
     }
 
     static string Header() => string.Format(Loc.T("Tray.Quarantine"), Model.I.QuarantineText);

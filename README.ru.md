@@ -165,6 +165,7 @@ dotnet test
 ```
 
 Debug-сборка перемещает и удаляет только внутри `C:\Demo\reclaimer-sandbox`; `pwsh tools/sandbox.ps1` создаёт её из файлов-пустышек.
+Debug-сборка, тесты и Release-сборка, запущенная с `--data-dir <папка>`, — dev-экземпляры: настройки, история и отстойник лежат в `%APPDATA%\Reclaimer-dev` и `%LOCALAPPDATA%\Reclaimer-dev` (или в указанной папке), и с установленной копией они не пересекаются.
 
 ## Лицензия
 

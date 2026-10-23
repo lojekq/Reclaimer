@@ -101,7 +101,7 @@ public static class Quarantine
     {
         if (Sandbox is not null) return Path.Combine(Sandbox, ".reclaimer-quarantine");
         var vol = Native.VolumeOf(realPath);
-        return SameVolume(AppInfo.LocalDir, vol) ? LocalRoot : Path.Combine(vol, ".reclaimer-quarantine");
+        return SameVolume(AppInfo.LocalDir, vol) ? LocalRoot : Path.Combine(vol, ".reclaimer-quarantine" + AppInfo.Suffix); // a dev instance never shares the installed copy's quarantine
     }
 
     static string LocalRoot => Path.Combine(AppInfo.LocalDir, "Quarantine");
@@ -117,7 +117,7 @@ public static class Quarantine
         var roots = new List<string> { LocalRoot };
         roots.AddRange(Settings.Current.QuarantineRoots);
         foreach (var d in DriveInfo.GetDrives())
-            if (d.DriveType == DriveType.Fixed) roots.Add(Path.Combine(d.Name, ".reclaimer-quarantine"));
+            if (d.DriveType == DriveType.Fixed) roots.Add(Path.Combine(d.Name, ".reclaimer-quarantine" + AppInfo.Suffix));
         return roots.Select(Path.GetFullPath).Distinct(StringComparer.OrdinalIgnoreCase);
     }
 
